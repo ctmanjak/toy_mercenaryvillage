@@ -31,6 +31,11 @@ namespace Core
             SceneManager.LoadScene("DungeonSelectScene");
         }
 
+        public void GoToGuildHouse()
+        {
+            SceneManager.LoadScene("GuildHouseScene");
+        }
+
         public void StartBattle(StageData stage)
         {
             CurrentStage = stage;

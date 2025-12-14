@@ -61,7 +61,7 @@ namespace UI
 
         private void OnGuildButtonClicked()
         {
-            ShowComingSoonPopup("길드하우스");
+            GameManager.Instance.GoToGuildHouse();
         }
 
         private void ShowComingSoonPopup(string buildingName)
