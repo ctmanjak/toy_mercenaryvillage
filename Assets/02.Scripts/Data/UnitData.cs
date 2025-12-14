@@ -1,3 +1,4 @@
+using Battle;
 using UnityEngine;
 
 namespace Data
@@ -18,7 +19,7 @@ namespace Data
         public UnitRole Role;
 
         [Tooltip("유닛 프리팹")]
-        public GameObject Prefab;
+        public BattleUnit Prefab;
 
         [Header("Base Stats")]
         [Tooltip("기본 HP")]

@@ -1,116 +1,91 @@
 ## 목표
 
-전투 중 화면 상단에 현재 스테이지 정보를 표시한다.
+4인 파티 슬롯을 관리하고, 전투 시 실제 파티 데이터를 사용하도록 연동한다.
 
 ---
 
 ## 산출물
 
-- `Assets/02.Scripts/UI/BattleHUD.cs`
-- 전투 HUD UI 프리팩
+- `PartyManager.cs`
+- BattleManager 파티 연동 수정
 
 ---
 
 ## 요구사항
 
-### UI 구성 요소
+### 파티 슬롯 구조
 
-| 요소 | 예시 |
-| --- | --- |
-| 스테이지 번호 | "1-3" |
-| 스테이지 이름 | "초원 깊은 곳" |
+| 필드 | 타입 | 설명 |
+| --- | --- | --- |
+| partySlots | MercenaryData[4] | 출전 파티 (null = 빈 슬롯) |
+| OnPartyChanged | Action | 파티 변경 시 이벤트 |
 
-### 표시 형식
+### 핵심 메서드
 
+```csharp
+public bool SetPartySlot(int slotIndex, MercenaryData merc);
+public void ClearPartySlot(int slotIndex);
+public MercenaryData[] GetParty();
+public int GetPartyCount(); // null 제외
+public bool IsInParty(MercenaryData merc);
 ```
-[1-3] 초원 깊은 곳
-```
 
-또는
+### 전투 연동
 
-```
-Stage 1-3
-초원 깊은 곳
-```
+- BattleManager.StartBattle()에서 하드코딩된 아군 생성 제거
+- PartyManager.GetParty()로 실제 파티 가져오기
+- 각 MercenaryData.CreateBattleUnit() 호출
 
 ---
 
 ## 설계 가이드
 
-### UI 계층 구조
+### 초기 파티 설정
 
+- 게임 시작 시 초기 용병 2명을 자동으로 파티에 배치
+- 슬롯 0, 1에 배치
+
+### 빈 파티 검증
+
+```csharp
+public bool CanStartBattle()
+{
+    return GetPartyCount() > 0;
+}
 ```
-BattleHUD (Panel, 상단)
-├─ StageInfoPanel
-│   ├─ StageNumberText ("1-3")
-│   └─ StageNameText ("초원 깊은 곳")
-└─ GoldUI (프리팩, 우측)
+
+### BattleManager 수정
+
+```csharp
+// 기존: 하드코딩된 테스트 유닛
+// 변경:
+private void SpawnAllies()
+{
+    var party = PartyManager.Instance.GetParty();
+    for (int i = 0; i < party.Length; i++)
+    {
+        if (party[i] == null) continue;
+        var unit = party[i].CreateBattleUnit(_allySpawnPoints[i].position);
+        RegisterUnit(unit, isAlly: true);
+    }
+}
 ```
-
-### 위치
-
-- Anchor: Top-Left 또는 Top-Center
-- 여백: (20, 20) from corner
-
-### 데이터 소스
-
-- GameManager.CurrentStage에서 읽어옴
-- 전투 시작 시 1회 설정
 
 ---
 
 ## 수락 기준
 
-- [ ]  BattleHUD.cs 컴파일 성공
-- [ ]  전투 시작 시 스테이지 정보 표시
-- [ ]  스테이지 번호 정상 표시
-- [ ]  스테이지 이름 정상 표시
-
----
-
-## 참고 코드 스니펫
-
-```csharp
-using UnityEngine;
-using TMPro;
-
-public class BattleHUD : MonoBehaviour
-{
-    [SerializeField] private TextMeshProUGUI _stageNumberText;
-    [SerializeField] private TextMeshProUGUI _stageNameText;
-    
-    private void Start()
-    {
-        SetupStageInfo();
-    }
-    
-    private void SetupStageInfo()
-    {
-        if (GameManager.Instance == null || 
-            GameManager.Instance.CurrentStage == null)
-        {
-            _stageNumberText.text = "---";
-            _stageNameText.text = "Unknown Stage";
-            return;
-        }
-        
-        var stage = GameManager.Instance.CurrentStage;
-        _stageNumberText.text = $"{stage.regionIndex}-{stage.stageIndex}";
-        _stageNameText.text = stage.stageName;
-    }
-}
-```
-
-### StageData 확장 (필요시)
-
-```csharp
-// StageData.cs에 추가
-public int regionIndex = 1;
-public int stageIndex = 1;
-```
+- [ ]  파티 슬롯 4개 정상 관리
+- [ ]  같은 용병 중복 배치 불가
+- [ ]  전투 시작 시 파티 용병으로 아군 생성
+- [ ]  빈 파티로 전투 시작 시 경고/차단
+- [ ]  파티 변경 이벤트 발생
 
 ---
 
 ## 후속 태스크 연결
 
-이 태스크는 독립적으로 완결됨.
+이 태스크 완료 후 진행 가능:
+
+- [S3] 파티 편성 UI
+- [S3] 길드 하우스 화면

@@ -41,20 +41,6 @@ namespace Battle
             return unit;
         }
 
-        public BattleUnit SpawnUnit(GameObject prefab, Team team, int index)
-        {
-            var position = GetSpawnPosition(team, index);
-            var go = Instantiate(prefab, position, Quaternion.identity);
-            var unit = go.GetComponent<BattleUnit>();
-
-            if (unit != null)
-            {
-                CreateHealthBar(unit);
-            }
-
-            return unit;
-        }
-
         private void CreateHealthBar(BattleUnit unit)
         {
             if (_healthBarPrefab == null || unit == null) return;

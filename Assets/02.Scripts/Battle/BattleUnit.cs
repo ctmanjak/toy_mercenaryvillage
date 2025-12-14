@@ -66,6 +66,7 @@ namespace Battle
         public void SetHealthBar(UnitHealthBar healthBar)
         {
             _healthBar = healthBar;
+            _healthBar?.Initialize(this);
         }
 
         public void Initialize(UnitData data, int level, Team team)

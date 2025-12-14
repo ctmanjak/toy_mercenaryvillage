@@ -17,10 +17,6 @@ namespace Battle
         [SerializeField] private SpawnManager _spawnManager;
         [SerializeField] private BattleResultUI _resultUI;
 
-        [Header("Test Party (v0.1)")]
-        [SerializeField] private List<UnitData> _testParty;
-        [SerializeField] private int _testPartyLevel = 1;
-
         private List<BattleUnit> _allies = new();
         private List<BattleUnit> _enemies = new();
         private List<BattleUnit> _allUnits = new();
@@ -40,7 +36,7 @@ namespace Battle
         {
             if (GameManager.Instance != null && GameManager.Instance.CurrentStage != null)
             {
-                StartBattle(GameManager.Instance.CurrentStage, _testParty, _testPartyLevel);
+                StartBattle(GameManager.Instance.CurrentStage);
             }
         }
 
@@ -195,27 +191,30 @@ namespace Battle
 
         public void StartBattle(StageData stage)
         {
-            StartBattle(stage, null, 1);
-        }
-
-        public void StartBattle(StageData stage, List<UnitData> party, int partyLevel = 1)
-        {
             if (_phase == BattlePhase.Fighting)
             {
                 Debug.LogWarning("[BattleManager] Battle already in progress");
                 return;
             }
 
+            if (PartyManager.Instance == null)
+            {
+                Debug.LogError("[BattleManager] PartyManager not found!");
+                return;
+            }
+
+            if (!PartyManager.Instance.CanStartBattle())
+            {
+                Debug.LogWarning("[BattleManager] Cannot start battle: Party is empty!");
+                return;
+            }
+
             ClearAllUnits();
             _currentStage = stage;
-            
+
             SpawnEnemies(stage);
-            
-            if (party != null && party.Count > 0)
-            {
-                SpawnAllies(party, partyLevel);
-            }
-            
+            SpawnAlliesFromParty();
+
             foreach (var unit in _allUnits)
             {
                 unit.UpdateTarget();
@@ -250,21 +249,25 @@ namespace Battle
             return spawnedEnemies;
         }
 
-        public List<BattleUnit> SpawnAllies(List<UnitData> party, int level = 1)
+        private List<BattleUnit> SpawnAlliesFromParty()
         {
             var spawnedAllies = new List<BattleUnit>();
+            var party = PartyManager.Instance.GetParty();
 
-            for (int i = 0; i < party.Count; i++)
+            for (int i = 0; i < party.Length; i++)
             {
-                var unitData = party[i];
-                var unit = SpawnUnit(unitData, level, Team.Ally, i);
+                if (party[i] == null) continue;
+
+                var merc = party[i];
+                var unit = SpawnUnit(merc.UnitData, merc.Level, Team.Ally, i);
+
                 if (unit != null)
                 {
                     spawnedAllies.Add(unit);
                 }
             }
 
-            Debug.Log($"[BattleManager] Spawned {spawnedAllies.Count} allies");
+            Debug.Log($"[BattleManager] Spawned {spawnedAllies.Count} allies from party");
             return spawnedAllies;
         }
     }
