@@ -93,19 +93,27 @@ namespace Battle
 
         private void EndBattle(BattleResult result)
         {
+            if (_phase == BattlePhase.Ended) return;
+
             _phase = BattlePhase.Ended;
-            Debug.Log($"[BattleManager] Battle ended: {result}");
 
             int reward = 0;
             if (result == BattleResult.Victory && _currentStage != null)
             {
                 reward = _currentStage.GoldReward;
+
+                if (PlayerResourceManager.Instance != null)
+                {
+                    PlayerResourceManager.Instance.AddGold(reward);
+                }
             }
 
             if (_resultUI != null)
             {
                 _resultUI.Show(result, reward);
             }
+
+            Debug.Log($"[BattleManager] Battle ended: {result}, Reward: {reward}G");
         }
         
         public List<BattleUnit> GetAllUnits() => _allUnits;

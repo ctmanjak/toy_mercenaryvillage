@@ -1,143 +1,117 @@
 ## 목표
 
-전투 결과 화면에 "다시 도전", "마을로" 버튼을 추가하고 기능을 연결한다.
+전투 승리 시 스테이지에 설정된 골드 보상을 플레이어에게 지급한다.
 
 ---
 
 ## 산출물
 
-- BattleResultUI에 버튼 2개 추가
-- 버튼 클릭 로직 구현
+- BattleManager 보상 지급 로직
+- PlayerData 연동
 
 ---
 
 ## 요구사항
 
-### 버튼 구성
+### 보상 지급 조건
 
-| 버튼 | 동작 |
+| 결과 | 보상 |
 | --- | --- |
-| 다시 도전 | 같은 스테이지로 재전투 |
-| 마을로 | TownScene으로 이동 |
+| 승리 | StageData.goldReward 지급 |
+| 패배 | 보상 없음 (0G) |
 
-### UI 구성
+### 보상 흐름
 
 ```
-BattleResultUI (Panel)
-├─ ResultText ("승리!" / "패배...")
-├─ RewardText ("획득: 50G")
-└─ ButtonContainer
-    ├─ RetryButton ("다시 도전")
-    └─ TownButton ("마을로")
+전투 종료 (Victory)
+    ↓
+BattleManager.EndBattle()
+    ↓
+PlayerData.AddGold(reward)
+    ↓
+BattleResultUI.Show(result, reward)
 ```
 
 ---
 
 ## 설계 가이드
 
-### 다시 도전 처리
+### StageData 필드 확인
 
-- GameManager.CurrentStage 유지
-- BattleScene 재로드
+```csharp
+public int goldReward = 50;  // S1에서 이미 정의됨
+```
 
-### 마을 복귀 처리
+### 보상 지급 시점
 
-- GameManager.ReturnToTown() 호출
+- EndBattle() 내부에서 승리 판정 직후
+- UI 표시 전에 지급 완료
 
-### 버튼 배치
+### 중복 지급 방지
 
-- 가로 나란히 또는 세로 배치
-- HorizontalLayoutGroup 사용 권장
+- EndBattle()은 1회만 호출되도록 BattlePhase 체크
 
 ---
 
 ## 수락 기준
 
-- [ ]  "다시 도전" 버튼 UI 추가
-- [ ]  "마을로" 버튼 UI 추가
-- [ ]  다시 도전 클릭 시 전투 재시작
-- [ ]  마을로 클릭 시 TownScene 전환
-- [ ]  승리/패배 모두 버튼 정상 동작
+- [ ]  승리 시 PlayerData에 골드 추가
+- [ ]  패배 시 골드 추가 없음
+- [ ]  결과 화면에 획득 골드 표시
+- [ ]  마을 복귀 후 GoldUI에 반영 확인
+- [ ]  다시 도전 시 추가 보상 정상 지급
 
 ---
 
 ## 참고 코드 스니펫
 
 ```csharp
-// BattleResultUI.cs 확장
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-
-public class BattleResultUI : MonoBehaviour
+// BattleManager.cs 수정
+private void EndBattle(BattleResult result)
 {
-    [Header("UI References")]
-    [SerializeField] private GameObject _panel;
-    [SerializeField] private TextMeshProUGUI _resultText;
-    [SerializeField] private TextMeshProUGUI _rewardText;
+    if (phase == BattlePhase.Ended) return;  // 중복 호출 방지
     
-    [Header("Buttons")]
-    [SerializeField] private Button _retryButton;
-    [SerializeField] private Button _townButton;
+    phase = BattlePhase.Ended;
     
-    [Header("Colors")]
-    [SerializeField] private Color _victoryColor = Color.yellow;
-    [SerializeField] private Color _defeatColor = Color.gray;
+    int reward = 0;
     
-    private void Awake()
+    if (result == BattleResult.Victory)
     {
-        Hide();
+        reward = _currentStage.goldReward;
         
-        _retryButton.onClick.AddListener(OnRetryClicked);
-        _townButton.onClick.AddListener(OnTownClicked);
-    }
-    
-    public void Show(BattleResult result, int goldReward = 0)
-    {
-        _panel.SetActive(true);
-        
-        if (result == BattleResult.Victory)
+        // 골드 지급
+        if (PlayerData.Instance != null)
         {
-            _resultText.text = "승리!";
-            _resultText.color = _victoryColor;
-            _rewardText.text = $"획득 곢8드: {goldReward}G";
-            _rewardText.gameObject.SetActive(true);
-        }
-        else
-        {
-            _resultText.text = "패배...";
-            _resultText.color = _defeatColor;
-            _rewardText.gameObject.SetActive(false);
+            PlayerData.Instance.AddGold(reward);
         }
     }
     
-    public void Hide()
+    // 결과 UI 표시
+    if (_resultUI != null)
     {
-        _panel.SetActive(false);
+        _resultUI.Show(result, reward);
     }
     
-    private void OnRetryClicked()
-    {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.StartBattle(GameManager.Instance.CurrentStage);
-        }
-    }
-    
-    private void OnTownClicked()
-    {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.ReturnToTown();
-        }
-    }
+    Debug.Log($"Battle Ended: {result}, Reward: {reward}G");
 }
 ```
+
+### 스테이지별 보상 예시 (v0.1)
+
+| 스테이지 | 보상 골드 |
+| --- | --- |
+| 1-1 | 30G |
+| 1-2 | 40G |
+| 1-3 | 50G |
+| 1-4 | 60G |
+| 1-5 | 80G |
 
 ---
 
 ## 후속 태스크 연결
 
-이 태스크 완료 후 진행 가능:
+이 태스크는 독립적으로 완결됨.
 
-- [S2] 전투 결과 → 마을 복귀 연결
+관련 태스크:
+
+- [S2] PlayerData: 골드 보유량 관리 (선행)
