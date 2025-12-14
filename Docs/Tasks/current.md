@@ -1,117 +1,116 @@
 ## 목표
 
-전투 승리 시 스테이지에 설정된 골드 보상을 플레이어에게 지급한다.
+전투 중 화면 상단에 현재 스테이지 정보를 표시한다.
 
 ---
 
 ## 산출물
 
-- BattleManager 보상 지급 로직
-- PlayerData 연동
+- `Assets/02.Scripts/UI/BattleHUD.cs`
+- 전투 HUD UI 프리팩
 
 ---
 
 ## 요구사항
 
-### 보상 지급 조건
+### UI 구성 요소
 
-| 결과 | 보상 |
+| 요소 | 예시 |
 | --- | --- |
-| 승리 | StageData.goldReward 지급 |
-| 패배 | 보상 없음 (0G) |
+| 스테이지 번호 | "1-3" |
+| 스테이지 이름 | "초원 깊은 곳" |
 
-### 보상 흐름
+### 표시 형식
 
 ```
-전투 종료 (Victory)
-    ↓
-BattleManager.EndBattle()
-    ↓
-PlayerData.AddGold(reward)
-    ↓
-BattleResultUI.Show(result, reward)
+[1-3] 초원 깊은 곳
+```
+
+또는
+
+```
+Stage 1-3
+초원 깊은 곳
 ```
 
 ---
 
 ## 설계 가이드
 
-### StageData 필드 확인
+### UI 계층 구조
 
-```csharp
-public int goldReward = 50;  // S1에서 이미 정의됨
+```
+BattleHUD (Panel, 상단)
+├─ StageInfoPanel
+│   ├─ StageNumberText ("1-3")
+│   └─ StageNameText ("초원 깊은 곳")
+└─ GoldUI (프리팩, 우측)
 ```
 
-### 보상 지급 시점
+### 위치
 
-- EndBattle() 내부에서 승리 판정 직후
-- UI 표시 전에 지급 완료
+- Anchor: Top-Left 또는 Top-Center
+- 여백: (20, 20) from corner
 
-### 중복 지급 방지
+### 데이터 소스
 
-- EndBattle()은 1회만 호출되도록 BattlePhase 체크
+- GameManager.CurrentStage에서 읽어옴
+- 전투 시작 시 1회 설정
 
 ---
 
 ## 수락 기준
 
-- [ ]  승리 시 PlayerData에 골드 추가
-- [ ]  패배 시 골드 추가 없음
-- [ ]  결과 화면에 획득 골드 표시
-- [ ]  마을 복귀 후 GoldUI에 반영 확인
-- [ ]  다시 도전 시 추가 보상 정상 지급
+- [ ]  BattleHUD.cs 컴파일 성공
+- [ ]  전투 시작 시 스테이지 정보 표시
+- [ ]  스테이지 번호 정상 표시
+- [ ]  스테이지 이름 정상 표시
 
 ---
 
 ## 참고 코드 스니펫
 
 ```csharp
-// BattleManager.cs 수정
-private void EndBattle(BattleResult result)
+using UnityEngine;
+using TMPro;
+
+public class BattleHUD : MonoBehaviour
 {
-    if (phase == BattlePhase.Ended) return;  // 중복 호출 방지
+    [SerializeField] private TextMeshProUGUI _stageNumberText;
+    [SerializeField] private TextMeshProUGUI _stageNameText;
     
-    phase = BattlePhase.Ended;
-    
-    int reward = 0;
-    
-    if (result == BattleResult.Victory)
+    private void Start()
     {
-        reward = _currentStage.goldReward;
-        
-        // 골드 지급
-        if (PlayerData.Instance != null)
+        SetupStageInfo();
+    }
+    
+    private void SetupStageInfo()
+    {
+        if (GameManager.Instance == null || 
+            GameManager.Instance.CurrentStage == null)
         {
-            PlayerData.Instance.AddGold(reward);
+            _stageNumberText.text = "---";
+            _stageNameText.text = "Unknown Stage";
+            return;
         }
+        
+        var stage = GameManager.Instance.CurrentStage;
+        _stageNumberText.text = $"{stage.regionIndex}-{stage.stageIndex}";
+        _stageNameText.text = stage.stageName;
     }
-    
-    // 결과 UI 표시
-    if (_resultUI != null)
-    {
-        _resultUI.Show(result, reward);
-    }
-    
-    Debug.Log($"Battle Ended: {result}, Reward: {reward}G");
 }
 ```
 
-### 스테이지별 보상 예시 (v0.1)
+### StageData 확장 (필요시)
 
-| 스테이지 | 보상 골드 |
-| --- | --- |
-| 1-1 | 30G |
-| 1-2 | 40G |
-| 1-3 | 50G |
-| 1-4 | 60G |
-| 1-5 | 80G |
+```csharp
+// StageData.cs에 추가
+public int regionIndex = 1;
+public int stageIndex = 1;
+```
 
 ---
 
 ## 후속 태스크 연결
 
 이 태스크는 독립적으로 완결됨.
-
-관련 태스크:
-
-- [S2] PlayerData: 골드 보유량 관리 (선행)

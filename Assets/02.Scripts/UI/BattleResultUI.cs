@@ -12,7 +12,14 @@ namespace UI
         [SerializeField] private GameObject _panel;
         [SerializeField] private TextMeshProUGUI _resultText;
         [SerializeField] private TextMeshProUGUI _rewardText;
-        [SerializeField] private Button _returnButton;
+
+        [Header("Buttons")]
+        [SerializeField] private Button _retryButton;
+        [SerializeField] private Button _townButton;
+
+        [Header("Colors")]
+        [SerializeField] private Color _victoryColor = Color.yellow;
+        [SerializeField] private Color _defeatColor = Color.gray;
 
         private void Awake()
         {
@@ -21,21 +28,37 @@ namespace UI
 
         private void Start()
         {
-            if (_returnButton != null)
+            if (_retryButton != null)
             {
-                _returnButton.onClick.AddListener(OnReturnButtonClicked);
+                _retryButton.onClick.AddListener(OnRetryClicked);
+            }
+            if (_townButton != null)
+            {
+                _townButton.onClick.AddListener(OnTownClicked);
             }
         }
 
         private void OnDestroy()
         {
-            if (_returnButton != null)
+            if (_retryButton != null)
             {
-                _returnButton.onClick.RemoveListener(OnReturnButtonClicked);
+                _retryButton.onClick.RemoveListener(OnRetryClicked);
+            }
+            if (_townButton != null)
+            {
+                _townButton.onClick.RemoveListener(OnTownClicked);
             }
         }
 
-        private void OnReturnButtonClicked()
+        private void OnRetryClicked()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentStage != null)
+            {
+                GameManager.Instance.StartBattle(GameManager.Instance.CurrentStage);
+            }
+        }
+
+        private void OnTownClicked()
         {
             if (GameManager.Instance != null)
             {
@@ -50,12 +73,14 @@ namespace UI
             if (result == BattleResult.Victory)
             {
                 _resultText.text = "승리!";
+                _resultText.color = _victoryColor;
                 _rewardText.text = $"획득 골드: {goldReward}G";
                 _rewardText.gameObject.SetActive(true);
             }
             else
             {
                 _resultText.text = "패배..";
+                _resultText.color = _defeatColor;
                 _rewardText.gameObject.SetActive(false);
             }
         }
