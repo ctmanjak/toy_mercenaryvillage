@@ -1,5 +1,7 @@
 using Battle;
+using Core;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 namespace UI
@@ -10,10 +12,35 @@ namespace UI
         [SerializeField] private GameObject _panel;
         [SerializeField] private TextMeshProUGUI _resultText;
         [SerializeField] private TextMeshProUGUI _rewardText;
+        [SerializeField] private Button _returnButton;
 
         private void Awake()
         {
             Hide();
+        }
+
+        private void Start()
+        {
+            if (_returnButton != null)
+            {
+                _returnButton.onClick.AddListener(OnReturnButtonClicked);
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_returnButton != null)
+            {
+                _returnButton.onClick.RemoveListener(OnReturnButtonClicked);
+            }
+        }
+
+        private void OnReturnButtonClicked()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.GoToTown();
+            }
         }
 
         public void Show(BattleResult result, int goldReward = 0)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core;
 using Data;
 using UI;
 using UnityEngine;
@@ -16,9 +17,9 @@ namespace Battle
         [SerializeField] private SpawnManager _spawnManager;
         [SerializeField] private BattleResultUI _resultUI;
 
-        [Header("Test")]
-        [SerializeField] private BattleUnit _testAllyPrefab;
-        [SerializeField] private BattleUnit _testEnemyPrefab;
+        [Header("Test Party (v0.1)")]
+        [SerializeField] private List<UnitData> _testParty;
+        [SerializeField] private int _testPartyLevel = 1;
 
         private List<BattleUnit> _allies = new();
         private List<BattleUnit> _enemies = new();
@@ -34,7 +35,15 @@ namespace Battle
         {
             Instance = this;
         }
-        
+
+        private void Start()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentStage != null)
+            {
+                StartBattle(GameManager.Instance.CurrentStage, _testParty, _testPartyLevel);
+            }
+        }
+
         private void Update()
         {
             if (_phase != BattlePhase.Fighting) return;

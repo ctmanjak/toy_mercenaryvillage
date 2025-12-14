@@ -209,7 +209,7 @@ GameObject:
   - component: {fileID: 154815035}
   - component: {fileID: 154815034}
   m_Layer: 5
-  m_Name: SubmitText
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -254,7 +254,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD655\uC778"
+  m_text: "\uB3CC\uC544\uAC00\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 06a16608dbc6b4487a967a724d84ed63, type: 2}
   m_sharedMaterial: {fileID: 9119907907537136759, guid: 06a16608dbc6b4487a967a724d84ed63, type: 2}
@@ -7944,6 +7944,7 @@ MonoBehaviour:
   _panel: {fileID: 2067832928}
   _resultText: {fileID: 2034642708}
   _rewardText: {fileID: 1836940530}
+  _returnButton: {fileID: 1077875263}
 --- !u!1 &504993569
 GameObject:
   m_ObjectHideFlags: 0
@@ -8021,8 +8022,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Battle.BattleManager
   _spawnManager: {fileID: 1592169409}
   _resultUI: {fileID: 391150711}
-  _testAllyPrefab: {fileID: 8379906347518684461, guid: 960facf2bb8e3452b8a8a67d3ee3ef67, type: 3}
-  _testEnemyPrefab: {fileID: 1811917990876866780, guid: 5fbe5dba19d3e44ecbfed8693b87eb60, type: 3}
+  _testParty:
+  - {fileID: 11400000, guid: e0e63173dc9d54ec880861b25af5c078, type: 2}
+  _testPartyLevel: 1
 --- !u!4 &514351601
 Transform:
   m_ObjectHideFlags: 0
@@ -8512,7 +8514,7 @@ GameObject:
   - component: {fileID: 1077875264}
   - component: {fileID: 1077875263}
   m_Layer: 5
-  m_Name: SubmitButton
+  m_Name: ReturnButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8536,7 +8538,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 10}
-  m_SizeDelta: {x: 100, y: 60}
+  m_SizeDelta: {x: 165, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1077875263
 MonoBehaviour:
