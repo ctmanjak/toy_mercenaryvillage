@@ -1,0 +1,163 @@
+using Data;
+using UnityEngine;
+
+namespace Battle
+{
+    public enum UnitState { Idle, Move, Attack, Dead }
+    public enum Team { Ally, Enemy }
+    
+    [RequireComponent(typeof(UnitMovement))]
+    [RequireComponent(typeof(UnitCombat))]
+    public class BattleUnit : MonoBehaviour
+    {
+        [Header("Status")]
+        [SerializeField] private Team _team;
+        [SerializeField] private UnitState _state = UnitState.Idle;
+
+        [Header("Stats")]
+        [SerializeField] private UnitStats _stats;
+        [SerializeField] private float _health;
+
+        [Header("Combat")]
+        [SerializeField] private BattleUnit _currentTarget;
+
+        private UnitMovement _movement;
+        private UnitCombat _combat;
+
+        #region Properties
+        public Team Team => _team;
+        public UnitState State => _state;
+        public UnitStats Stats => _stats;
+        public float MaxHealth => _stats.MaxHealth;
+        public float Health => _health;
+        public float AttackDamage => _stats.AttackDamage;
+        public float AttackSpeed => _stats.AttackSpeed;
+        public float MoveSpeed => _stats.MoveSpeed;
+        public float AttackRange => _stats.AttackRange;
+        public BattleUnit CurrentTarget => _currentTarget;
+        public bool IsDead => _state == UnitState.Dead;
+        public bool IsAlive => !IsDead;
+        public float HealthRatio => _stats.MaxHealth > 0 ? _health / _stats.MaxHealth : 0f;
+        #endregion
+
+        public event System.Action<BattleUnit> OnDeath;
+
+        private void Awake()
+        {
+            _movement = GetComponent<UnitMovement>();
+            _combat = GetComponent<UnitCombat>();
+        }
+
+        public void Initialize(UnitStats stats, Team team)
+        {
+            _team = team;
+            _stats = stats;
+            _health = stats.MaxHealth;
+
+            _state = UnitState.Idle;
+            _currentTarget = null;
+        }
+
+        public void Initialize(UnitData data, int level, Team team)
+        {
+            var stats = UnitStats.FromUnitData(data, level);
+            Initialize(stats, team);
+        }
+        
+        public void TakeDamage(float damage)
+        {
+            if (IsDead) return;
+
+            _health -= damage;
+
+            if (_health <= 0f)
+            {
+                _health = 0f;
+                Die();
+            }
+        }
+        
+        public void SetState(UnitState newState)
+        {
+            if (IsDead && newState != UnitState.Dead) return;
+            _state = newState;
+        }
+        
+        public void SetTarget(BattleUnit target)
+        {
+            _currentTarget = target;
+        }
+
+        public void UpdateAI()
+        {
+            if (IsDead) return;
+
+            UpdateTarget();
+
+            if (_currentTarget == null || _currentTarget.IsDead)
+            {
+                SetState(UnitState.Idle);
+                return;
+            }
+
+            switch (_state)
+            {
+                case UnitState.Idle:
+                case UnitState.Move:
+                    _movement.UpdateMovement(_currentTarget);
+                    break;
+                case UnitState.Attack:
+                    _combat.UpdateCombat(_currentTarget);
+                    break;
+            }
+        }
+
+        private void Die()
+        {
+            _state = UnitState.Dead;
+            _currentTarget = null;
+
+            OnDeath?.Invoke(this);
+
+            gameObject.SetActive(false);
+        }
+        
+        public void UpdateTarget()
+        {
+            if (_currentTarget == null || _currentTarget.IsDead)
+            {
+                _currentTarget = FindClosestEnemy();
+            }
+        }
+
+        private BattleUnit FindClosestEnemy()
+        {
+            var enemies = BattleManager.Instance.GetEnemiesOf(_team);
+
+            BattleUnit closest = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (var enemy in enemies)
+            {
+                if (enemy.IsDead) continue;
+
+                float dist = Vector2.Distance(transform.position, enemy.transform.position);
+                if (dist < closestDistance)
+                {
+                    closestDistance = dist;
+                    closest = enemy;
+                }
+            }
+
+            return closest;
+        }
+
+#if UNITY_EDITOR
+        [ContextMenu("Initialize with Default Stats")]
+        private void InitializeWithDefaultStats()
+        {
+            Initialize(UnitStats.Default, Team.Ally);
+        }
+#endif
+    }
+}

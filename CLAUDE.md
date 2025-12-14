@@ -13,7 +13,7 @@
 ## 코딩 컨벤션
 
 ### 네이밍
-- `PascalCase`: 클래스, 메서드, 프로퍼티
+- `PascalCase`: 클래스, 메서드, 프로퍼티, public 필드
 - `camelCase`: 지역변수, 매개변수
 - `_camelCase`: private 필드
 - `I` 접두어: 인터페이스
