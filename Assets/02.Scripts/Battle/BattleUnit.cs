@@ -1,4 +1,6 @@
+using System;
 using Data;
+using UI;
 using UnityEngine;
 
 namespace Battle
@@ -23,6 +25,7 @@ namespace Battle
 
         private UnitMovement _movement;
         private UnitCombat _combat;
+        private UnitHealthBar _healthBar;
 
         #region Properties
         public Team Team => _team;
@@ -40,7 +43,7 @@ namespace Battle
         public float HealthRatio => _stats.MaxHealth > 0 ? _health / _stats.MaxHealth : 0f;
         #endregion
 
-        public event System.Action<BattleUnit> OnDeath;
+        public event Action<BattleUnit> OnDeath;
 
         private void Awake()
         {
@@ -56,6 +59,13 @@ namespace Battle
 
             _state = UnitState.Idle;
             _currentTarget = null;
+
+            _healthBar?.Initialize(this);
+        }
+
+        public void SetHealthBar(UnitHealthBar healthBar)
+        {
+            _healthBar = healthBar;
         }
 
         public void Initialize(UnitData data, int level, Team team)
@@ -69,6 +79,7 @@ namespace Battle
             if (IsDead) return;
 
             _health -= damage;
+            _healthBar?.UpdateHealthBar();
 
             if (_health <= 0f)
             {
@@ -116,6 +127,8 @@ namespace Battle
         {
             _state = UnitState.Dead;
             _currentTarget = null;
+
+            _healthBar?.Hide();
 
             OnDeath?.Invoke(this);
 

@@ -76,3 +76,8 @@ crashlytics-build.properties
 
 .idea/
 .claude/
+
+Assets/_Recovery/*
+Assets/_Recovery.meta
+Assets/Screenshots/*
+Assets/Screenshots.meta

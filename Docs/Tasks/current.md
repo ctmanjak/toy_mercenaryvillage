@@ -1,134 +1,121 @@
 ## 목표
 
-전투 종료 후 승리/패배 결과와 획득 보상을 표시하는 UI를 구현한다.
+스테이지 선택 시 해당 스테이지 데이터를 전투 씬에 전달하고 씬을 전환한다.
 
 ---
 
 ## 산출물
 
-- `Assets/02.Scripts/UI/BattleResultUI.cs`
-- 결과 화면 UI 프리팩
+- 씬 전환 로직 구현 (GameManager 활용)
 
 ---
 
 ## 요구사항
 
-### UI 구성 요소
+### 데이터 전달 흐름
 
-| 요소 | 설명 |
-| --- | --- |
-| 결과 텍스트 | "승리!" 또는 "패배..." |
-| 보상 표시 | "획득 골드: 150G" |
-| 배경 | 반투명 패널 또는 오버레이 |
+```
+스테이지 선택 → GameManager에 저장 → 씬 전환 → BattleManager에서 읽어서 사용
+```
 
-### 기능
+### GameManager 역할
 
-- `Show(BattleResult result, int goldReward)`: 결과 화면 표시
-- `Hide()`: 결과 화면 숨김
-
-### 표시 조건
-
-- 승리 시: 택스트 + 보상 골드 표시
-- 패배 시: 텍스트만 표시 (보상 없음)
+- 현재 선택된 StageData 보관
+- 씬 간 데이터 전달 중개
+- DontDestroyOnLoad
 
 ---
 
 ## 설계 가이드
 
-### UI 계층 구조
+### 씬 전환 순서
 
-```
-BattleResultUI (Panel)
-├── Background (Image, 반투명)
-├── ResultText (TextMeshPro)
-└── RewardText (TextMeshPro)
-```
+1. 사용자가 스테이지 버튼 클릭
+2. StageListUI에서 OnStageSelected 이벤트 발생
+3. DungeonSelectUI에서 GameManager.SetCurrentStage() 호출
+4. SceneManager.LoadScene("BattleScene")
+5. BattleScene의 BattleManager에서 GameManager.CurrentStage 참조
 
-### 초기 상태
+### v0.1 단순화
 
-- `SetActive(false)`로 숨겨둔 상태
-- 전투 종료 시 BattleManager에서 호출
-
-### 색상 구분
-
-- 승리: 금색/노란색 텍스트
-- 패배: 회색/빨간색 텍스트
+- 파티 편성 화면 생략
+- 고정된 테스트 파티로 바로 전투 진입
 
 ---
 
 ## 수락 기준
 
-- [ ]  BattleResultUI.cs 컴파일 성공
-- [ ]  결과 화면 UI 프리팩 생성
-- [ ]  승리 시 "승리!" + 골드 표시
-- [ ]  패배 시 "패배..." 표시
-- [ ]  BattleManager에서 EndBattle() 시 UI 호출 연동
-- [ ]  테스트: 승리/패배 각각 UI 확인
+- [ ]  스테이지 선택 시 데이터 저장
+- [ ]  전투 씬으로 정상 전환
+- [ ]  BattleManager에서 선택된 스테이지 데이터 사용 확인
+- [ ]  전투 정상 진행 확인
 
 ---
 
 ## 참고 코드 스니펫
 
 ```csharp
+// GameManager.cs
 using UnityEngine;
-using TMPro;
+using UnityEngine.SceneManagement;
 
-public class BattleResultUI : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    [Header("UI References")]
-    [SerializeField] private GameObject _panel;
-    [SerializeField] private TextMeshProUGUI _resultText;
-    [SerializeField] private TextMeshProUGUI _rewardText;
+    public static GameManager Instance { get; private set; }
     
-    [Header("Colors")]
-    [SerializeField] private Color _victoryColor = Color.yellow;
-    [SerializeField] private Color _defeatColor = Color.gray;
+    public StageData CurrentStage { get; private set; }
     
     private void Awake()
     {
-        Hide();
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     
-    public void Show(BattleResult result, int goldReward = 0)
+    public void StartBattle(StageData stage)
     {
-        _panel.SetActive(true);
-        
-        if (result == BattleResult.Victory)
-        {
-            _resultText.text = "승리!";
-            _resultText.color = _victoryColor;
-            _rewardText.text = $"획득 골드: {goldReward}G";
-            _rewardText.gameObject.SetActive(true);
-        }
-        else
-        {
-            _resultText.text = "패배...";
-            _resultText.color = _defeatColor;
-            _rewardText.gameObject.SetActive(false);
-        }
+        CurrentStage = stage;
+        SceneManager.LoadScene("BattleScene");
     }
     
-    public void Hide()
+    public void ReturnToTown()
     {
-        _panel.SetActive(false);
+        SceneManager.LoadScene("TownScene");
+    }
+    
+    public void GoToDungeonSelect()
+    {
+        SceneManager.LoadScene("DungeonSelectScene");
     }
 }
+```
 
-// BattleManager.cs 연동
-[SerializeField] private BattleResultUI _resultUI;
-
-private void EndBattle(BattleResult result)
+```csharp
+// DungeonSelectUI.cs 수정
+private void Start()
 {
-    phase = BattlePhase.Ended;
-    
-    int reward = 0;
-    if (result == BattleResult.Victory)
+    _stageListUI.OnStageSelected += OnStageSelected;
+    _backButton.onClick.AddListener(() => GameManager.Instance.ReturnToTown());
+}
+
+private void OnStageSelected(StageData stage)
+{
+    GameManager.Instance.StartBattle(stage);
+}
+```
+
+```csharp
+// BattleManager.cs 수정 (Start 부분)
+private void Start()
+{
+    if (GameManager.Instance != null && GameManager.Instance.CurrentStage != null)
     {
-        reward = _currentStage.goldReward;
-        // TODO: 실제 골드 지급
+        StartBattle(GameManager.Instance.CurrentStage);
     }
-    
-    resultUI.Show(result, reward);
 }
 ```
 
@@ -138,4 +125,4 @@ private void EndBattle(BattleResult result)
 
 이 태스크 완료 후 진행 가능:
 
-- [S2] 결과 화면 버튼: 다시 도전/마을로 돌아가기
+- [S2] 전체 루프 플레이테스트

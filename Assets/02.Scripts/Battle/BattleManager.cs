@@ -131,21 +131,6 @@ namespace Battle
             _allies.Remove(unit);
             _enemies.Remove(unit);
         }
-        
-        public BattleUnit SpawnUnit(BattleUnit prefab, UnitStats stats, Team team, int spawnIndex)
-        {
-            if (_spawnManager == null || prefab == null)
-            {
-                Debug.LogError("[BattleManager] SpawnManager or prefab not assigned");
-                return null;
-            }
-
-            var unit = _spawnManager.SpawnUnit(prefab, team, spawnIndex);
-            unit.Initialize(stats, team);
-            RegisterUnit(unit);
-
-            return unit;
-        }
 
         public BattleUnit SpawnUnit(UnitData unitData, int level, Team team, int spawnIndex)
         {
@@ -161,9 +146,8 @@ namespace Battle
                 return null;
             }
 
-            Vector3 pos = _spawnManager.GetSpawnPosition(team, spawnIndex);
-            var go = Instantiate(unitData.Prefab, pos, Quaternion.identity);
-            var unit = go.GetComponent<BattleUnit>();
+            var unit = _spawnManager.SpawnUnit(unitData.Prefab, team, spawnIndex);
+            if (unit == null) return null;
 
             unit.Initialize(unitData, level, team);
             RegisterUnit(unit);
@@ -190,37 +174,6 @@ namespace Battle
             {
                 _resultUI.Hide();
             }
-        }
-        
-        [ContextMenu("Setup Test Battle")]
-        public void SetupTestBattle()
-        {
-            if (_testAllyPrefab == null || _testEnemyPrefab == null)
-            {
-                Debug.LogError("[BattleManager] Test prefabs not assigned");
-                return;
-            }
-
-            ClearAllUnits();
-
-            var defaultStats = UnitStats.Default;
-
-            for (int i = 0; i < 3; i++)
-            {
-                SpawnUnit(_testAllyPrefab, defaultStats, Team.Ally, i);
-            }
-
-            for (int i = 0; i < 3; i++)
-            {
-                SpawnUnit(_testEnemyPrefab, defaultStats, Team.Enemy, i);
-            }
-            
-            foreach (var unit in _allUnits)
-            {
-                unit.UpdateTarget();
-            }
-
-            Debug.Log($"[BattleManager] Test battle setup: {_allies.Count} allies vs {_enemies.Count} enemies");
         }
 
         public void StartBattle(StageData stage)
