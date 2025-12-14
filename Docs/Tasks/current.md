@@ -1,120 +1,135 @@
 ## 목표
 
-스테이지 선택 시 해당 스테이지 데이터를 전투 씬에 전달하고 씬을 전환한다.
+전투 결과 화면에 "다시 도전", "마을로" 버튼을 추가하고 기능을 연결한다.
 
 ---
 
 ## 산출물
 
-- 씬 전환 로직 구현 (GameManager 활용)
+- BattleResultUI에 버튼 2개 추가
+- 버튼 클릭 로직 구현
 
 ---
 
 ## 요구사항
 
-### 데이터 전달 흐름
+### 버튼 구성
+
+| 버튼 | 동작 |
+| --- | --- |
+| 다시 도전 | 같은 스테이지로 재전투 |
+| 마을로 | TownScene으로 이동 |
+
+### UI 구성
 
 ```
-스테이지 선택 → GameManager에 저장 → 씬 전환 → BattleManager에서 읽어서 사용
+BattleResultUI (Panel)
+├─ ResultText ("승리!" / "패배...")
+├─ RewardText ("획득: 50G")
+└─ ButtonContainer
+    ├─ RetryButton ("다시 도전")
+    └─ TownButton ("마을로")
 ```
-
-### GameManager 역할
-
-- 현재 선택된 StageData 보관
-- 씬 간 데이터 전달 중개
-- DontDestroyOnLoad
 
 ---
 
 ## 설계 가이드
 
-### 씬 전환 순서
+### 다시 도전 처리
 
-1. 사용자가 스테이지 버튼 클릭
-2. StageListUI에서 OnStageSelected 이벤트 발생
-3. DungeonSelectUI에서 GameManager.SetCurrentStage() 호출
-4. SceneManager.LoadScene("BattleScene")
-5. BattleScene의 BattleManager에서 GameManager.CurrentStage 참조
+- GameManager.CurrentStage 유지
+- BattleScene 재로드
 
-### v0.1 단순화
+### 마을 복귀 처리
 
-- 파티 편성 화면 생략
-- 고정된 테스트 파티로 바로 전투 진입
+- GameManager.ReturnToTown() 호출
+
+### 버튼 배치
+
+- 가로 나란히 또는 세로 배치
+- HorizontalLayoutGroup 사용 권장
 
 ---
 
 ## 수락 기준
 
-- [ ]  스테이지 선택 시 데이터 저장
-- [ ]  전투 씬으로 정상 전환
-- [ ]  BattleManager에서 선택된 스테이지 데이터 사용 확인
-- [ ]  전투 정상 진행 확인
+- [ ]  "다시 도전" 버튼 UI 추가
+- [ ]  "마을로" 버튼 UI 추가
+- [ ]  다시 도전 클릭 시 전투 재시작
+- [ ]  마을로 클릭 시 TownScene 전환
+- [ ]  승리/패배 모두 버튼 정상 동작
 
 ---
 
 ## 참고 코드 스니펫
 
 ```csharp
-// GameManager.cs
+// BattleResultUI.cs 확장
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
-public class GameManager : MonoBehaviour
+public class BattleResultUI : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    [Header("UI References")]
+    [SerializeField] private GameObject _panel;
+    [SerializeField] private TextMeshProUGUI _resultText;
+    [SerializeField] private TextMeshProUGUI _rewardText;
     
-    public StageData CurrentStage { get; private set; }
+    [Header("Buttons")]
+    [SerializeField] private Button _retryButton;
+    [SerializeField] private Button _townButton;
+    
+    [Header("Colors")]
+    [SerializeField] private Color _victoryColor = Color.yellow;
+    [SerializeField] private Color _defeatColor = Color.gray;
     
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        Hide();
+        
+        _retryButton.onClick.AddListener(OnRetryClicked);
+        _townButton.onClick.AddListener(OnTownClicked);
+    }
+    
+    public void Show(BattleResult result, int goldReward = 0)
+    {
+        _panel.SetActive(true);
+        
+        if (result == BattleResult.Victory)
         {
-            Destroy(gameObject);
-            return;
+            _resultText.text = "승리!";
+            _resultText.color = _victoryColor;
+            _rewardText.text = $"획득 곢8드: {goldReward}G";
+            _rewardText.gameObject.SetActive(true);
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        else
+        {
+            _resultText.text = "패배...";
+            _resultText.color = _defeatColor;
+            _rewardText.gameObject.SetActive(false);
+        }
     }
     
-    public void StartBattle(StageData stage)
+    public void Hide()
     {
-        CurrentStage = stage;
-        SceneManager.LoadScene("BattleScene");
+        _panel.SetActive(false);
     }
     
-    public void ReturnToTown()
+    private void OnRetryClicked()
     {
-        SceneManager.LoadScene("TownScene");
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartBattle(GameManager.Instance.CurrentStage);
+        }
     }
     
-    public void GoToDungeonSelect()
+    private void OnTownClicked()
     {
-        SceneManager.LoadScene("DungeonSelectScene");
-    }
-}
-```
-
-```csharp
-// DungeonSelectUI.cs 수정
-private void Start()
-{
-    _stageListUI.OnStageSelected += OnStageSelected;
-    _backButton.onClick.AddListener(() => GameManager.Instance.ReturnToTown());
-}
-
-private void OnStageSelected(StageData stage)
-{
-    GameManager.Instance.StartBattle(stage);
-}
-```
-
-```csharp
-// BattleManager.cs 수정 (Start 부분)
-private void Start()
-{
-    if (GameManager.Instance != null && GameManager.Instance.CurrentStage != null)
-    {
-        StartBattle(GameManager.Instance.CurrentStage);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ReturnToTown();
+        }
     }
 }
 ```
@@ -125,4 +140,4 @@ private void Start()
 
 이 태스크 완료 후 진행 가능:
 
-- [S2] 전체 루프 플레이테스트
+- [S2] 전투 결과 → 마을 복귀 연결
