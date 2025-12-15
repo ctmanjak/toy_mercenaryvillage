@@ -9,7 +9,7 @@ namespace Core
     {
         public static PartyManager Instance { get; private set; }
 
-        private const int PARTY_SIZE = 4;
+        public const int PARTY_SIZE = 4;
 
         private MercenaryData[] _partySlots = new MercenaryData[PARTY_SIZE];
 

@@ -17,6 +17,7 @@ namespace UI
         [Header("Components")]
         [SerializeField] private MercenaryListUI _mercenaryListUI;
         [SerializeField] private MercenaryDetailPanel _mercenaryDetailPanel;
+        [SerializeField] private PartyFormationUI _partyFormationUI;
 
         private void Start()
         {
@@ -36,6 +37,12 @@ namespace UI
             {
                 MercenaryManager.Instance.OnMercenaryLevelUp += HandleMercenaryLevelUp;
             }
+
+            // 파티 변경 시 용병 목록 갱신 (배지 업데이트)
+            if (_partyFormationUI != null)
+            {
+                _partyFormationUI.OnPartyUpdated += HandlePartyUpdated;
+            }
         }
 
         private void OnDestroy()
@@ -54,6 +61,11 @@ namespace UI
             {
                 MercenaryManager.Instance.OnMercenaryLevelUp -= HandleMercenaryLevelUp;
             }
+
+            if (_partyFormationUI != null)
+            {
+                _partyFormationUI.OnPartyUpdated -= HandlePartyUpdated;
+            }
         }
 
         private void HandleMercenarySelected(Data.MercenaryData mercenary)
@@ -61,6 +73,12 @@ namespace UI
             if (_mercenaryDetailPanel != null)
             {
                 _mercenaryDetailPanel.Show(mercenary);
+            }
+
+            // 파티 편성 UI에 선택된 용병 전달
+            if (_partyFormationUI != null)
+            {
+                _partyFormationUI.OnMercenarySelected(mercenary);
             }
         }
 
@@ -72,6 +90,15 @@ namespace UI
                 _mercenaryListUI.Refresh();
                 // 같은 용병 다시 선택하여 상세 패널 유지
                 _mercenaryListUI.SelectMercenary(mercenary);
+            }
+        }
+
+        private void HandlePartyUpdated()
+        {
+            // 파티 변경 시 용병 목록 새로고침 (배지 상태 업데이트)
+            if (_mercenaryListUI != null)
+            {
+                _mercenaryListUI.Refresh();
             }
         }
 
