@@ -22,7 +22,7 @@ namespace Data
         public BattleUnit Prefab;
 
         [Header("Base Stats")]
-        [Tooltip("기본 HP")]
+        [Tooltip("기본 생명력")]
         public float BaseHealth = 100f;
 
         [Tooltip("기본 공격력")]

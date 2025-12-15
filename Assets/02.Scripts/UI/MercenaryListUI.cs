@@ -20,13 +20,13 @@ namespace UI
 
         private void Start()
         {
-            SubscribeToEvents();
+            // SubscribeToEvents();
             Refresh();
         }
     
         private void OnDestroy()
         {
-            UnsubscribeFromEvents();
+            // UnsubscribeFromEvents();
             ClearSlots();
         }
     

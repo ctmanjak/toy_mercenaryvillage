@@ -46,7 +46,7 @@ namespace Data
         public float GetCurrentHP()
             => UnitData.GetHealth(Level);
         
-        public float GetCurrentATK()
+        public float GetCurrentAttackDamage()
             => UnitData.GetAttackDamage(Level);
         
         public UnitStats GetCurrentStats()

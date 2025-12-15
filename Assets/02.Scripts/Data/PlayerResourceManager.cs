@@ -143,7 +143,7 @@ namespace Data
             Debug.Log($"[PlayerResourceManager] 초기 용병 지급 완료: {_mercenaries.Count}명");
         }
 
-        private void SaveMercenaries()
+        public void SaveMercenaries()
         {
             var json = JsonUtility.ToJson(new MercenaryListWrapper { Mercenaries = _mercenaries });
             PlayerPrefs.SetString(MERCENARIES_KEY, json);
