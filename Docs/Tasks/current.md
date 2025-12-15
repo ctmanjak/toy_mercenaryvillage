@@ -1,82 +1,107 @@
 ## 목표
 
-술집에서 고용 가능한 용병 후보를 생성하고, 골드를 지불해 고용하는 기능을 구현한다.
+빈 파티 상태에서 게임 진행을 차단하고, 재사용 가능한 공통 경고 팝업 시스템을 구현한다.
 
 ---
 
 ## 산출물
 
-- `TavernManager.cs`
-- `HireableSlotUI.cs`
-- 고용 로직
+- `CommonPopup.cs` / `CommonPopup.prefab` (공통 팝업)
+- `PartyValidator.cs` (파티 검증 유틸)
 
 ---
 
 ## 요구사항
 
-### 고용 후보 생성
+### 1. 공통 경고 팝업 시스템
 
-- 후보 3명 표시
-- 직업 랜덤 (탱커/근접딜러/원거리딜러)
-- 모두 Lv.1
-- v0.1: 고정 라인업 (새로고침 없음)
+- 메시지 + 확인 버튼 (기본)
+- 메시지 + 확인/취소 버튼 (선택)
+- 씬 전환 시에도 유지되는 싱글톤 or DontDestroyOnLoad
+- 콜백 지원 (확인/취소 시 액션 실행)
 
-### 고용 비용
+### 2. GuildHouseScene - 뒤로가기 차단
 
-| 직업 | 비용 |
-| --- | --- |
-| 탱커 | 100G |
-| 근접딜러 | 80G |
-| 원거리딜러 | 80G |
+- 파티가 비어있으면 마을로 복귀 불가
+- "파티를 편성해야 마을로 돌아갈 수 있습니다" 팝업 표시
+- 최소 1명 이상 편성 시 정상 복귀
 
-### 고용 흐름
+### 3. DungeonSelectScene - 전투 시작 차단 (이중 안전)
 
-1. 후보 용병 클릭 → 상세 정보 표시
-2. "고용하기" 버튼 클릭
-3. 골드 확인 → 차감 → 소유 목록에 추가
-4. 해당 후보 슬롯 비움 (또는 새 후보 생성)
+- TownScene → DungeonSelectScene 직행 경로 대비
+- 빈 파티로 전투 시작 버튼 클릭 시 차단
+- "파티에 용병이 없습니다. 길드 하우스에서 편성해주세요" 팝업 표시
 
 ---
 
 ## 설계 가이드
 
-### TavernManager
+### CommonPopup 구조
 
 ```csharp
-public class TavernManager : MonoBehaviour
+public class CommonPopup : MonoBehaviour
 {
-    [SerializeField] private UnitData[] _unitTemplates; // 3종
-    [SerializeField] private int[] _hireCosts; // 직업별 비용
+    public static CommonPopup Instance;
     
-    private MercenaryData[] _candidates = new MercenaryData[3];
+    [SerializeField] private GameObject _popupPanel;
+    [SerializeField] private TMP_Text _messageText;
+    [SerializeField] private Button _confirmButton;
+    [SerializeField] private Button _cancelButton;
     
-    private void Start()
+    private System.Action _onConfirm;
+    private System.Action _onCancel;
+    
+    // 경고 팝업 (확인만)
+    public void ShowAlert(string message, System.Action onConfirm = null)
     {
-        GenerateCandidates();
+        _messageText.text = message;
+        _confirmButton.gameObject.SetActive(true);
+        _cancelButton.gameObject.SetActive(false);
+        _onConfirm = onConfirm;
+        _popupPanel.SetActive(true);
     }
     
-    private void GenerateCandidates()
+    // 확인/취소 팝업
+    public void ShowConfirm(string message, System.Action onConfirm, System.Action onCancel = null)
     {
-        for (int i = 0; i < 3; i++)
-        {
-            int randomIndex = Random.Range(0, _unitTemplates.Length);
-            _candidates[i] = new MercenaryData(_unitTemplates[randomIndex]);
-        }
+        _messageText.text = message;
+        _confirmButton.gameObject.SetActive(true);
+        _cancelButton.gameObject.SetActive(true);
+        _onConfirm = onConfirm;
+        _onCancel = onCancel;
+        _popupPanel.SetActive(true);
+    }
+}
+```
+
+### PartyValidator 유틸
+
+```csharp
+public static class PartyValidator
+{
+    public static bool HasAnyMember()
+    {
+        return PartyManager.Instance.GetPartyMembers().Any(m => m != null);
     }
     
-    public bool TryHire(int candidateIndex)
+    public static int GetMemberCount()
     {
-        var candidate = _candidates[candidateIndex];
-        if (candidate == null) return false;
-        
-        int cost = GetHireCost(candidate.unitData);
-        if (!PlayerData.Instance.SpendGold(cost))
-            return false;
-        
-        PlayerData.Instance.AddMercenary(candidate);
-        _candidates[candidateIndex] = null;
-        return true;
+        return PartyManager.Instance.GetPartyMembers().Count(m => m != null);
     }
+}
+```
+
+### 사용 예시 (GuildHouseScene)
+
+```csharp
+public void OnBackButtonClick()
+{
+    if (!PartyValidator.HasAnyMember())
+    {
+        CommonPopup.Instance.ShowAlert("파티를 편성해야 마을로 돌아갈 수 있습니다.");
+        return;
+    }
+    GameManager.Instance.GoToTown();
 }
 ```
 
@@ -84,15 +109,15 @@ public class TavernManager : MonoBehaviour
 
 ## 수락 기준
 
-- [ ]  술집 진입 시 후보 3명 생성
-- [ ]  후보 클릭 시 상세 정보 표시
-- [ ]  고용 버튼 클릭 시 골드 차감
-- [ ]  고용 성공 시 소유 목록에 추가
-- [ ]  고용된 슬롯 비움 처리
-- [ ]  골드 부족 시 고용 실패
+- [ ]  CommonPopup 싱글톤 구현 및 DontDestroyOnLoad 설정
+- [ ]  ShowAlert / ShowConfirm 메서드 동작
+- [ ]  GuildHouseScene: 빈 파티 시 뒤로가기 차단 + 팝업
+- [ ]  DungeonSelectScene: 빈 파티 시 전투 시작 차단 + 팝업
+- [ ]  정상 파티 상태에서는 기존 플로우 유지
 
 ---
 
-## 후속 태스크 연결
+## 참고
 
-- [S3] 용병 시스템 통합 플레이테스트
+- 길드 하우스 진입 시점에는 이미 초기 용병 2명이 파티에 배치되어 있음
+- 사용자가 모두 제거하고 나가려는 경우를 방지하는 목적

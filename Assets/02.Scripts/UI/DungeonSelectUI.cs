@@ -129,10 +129,15 @@ namespace UI
 
         private void OnStartBattleClicked()
         {
-            if (_selectedStage != null)
+            if (_selectedStage == null) return;
+
+            if (!PartyValidator.HasAnyMember())
             {
-                GameManager.Instance.StartBattle(_selectedStage);
+                CommonPopup.Instance?.ShowAlert("파티에 용병이 없습니다.\n길드 하우스에서 편성해주세요.");
+                return;
             }
+
+            GameManager.Instance.StartBattle(_selectedStage);
         }
     }
 }

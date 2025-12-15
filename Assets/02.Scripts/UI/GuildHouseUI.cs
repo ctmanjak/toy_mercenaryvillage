@@ -104,6 +104,11 @@ namespace UI
 
         private void OnBackButtonClicked()
         {
+            if (!PartyValidator.HasAnyMember())
+            {
+                CommonPopup.Instance?.ShowAlert("파티를 편성해야 마을로 돌아갈 수 있습니다.");
+                return;
+            }
             GameManager.Instance.GoToTown();
         }
     }
