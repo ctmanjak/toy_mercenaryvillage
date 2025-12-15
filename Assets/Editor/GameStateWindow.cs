@@ -147,8 +147,8 @@ public class GameStateWindow : EditorWindow
         if (merc.UnitData != null)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"HP: {merc.GetCurrentHP():F0}", GUILayout.Width(80));
-            EditorGUILayout.LabelField($"ATK: {merc.GetCurrentAttackDamage():F0}", GUILayout.Width(80));
+            EditorGUILayout.LabelField($"Health: {merc.GetCurrentHealth():F0}", GUILayout.Width(80));
+            EditorGUILayout.LabelField($"AttackDamage: {merc.GetCurrentAttackDamage():F0}", GUILayout.Width(80));
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.LabelField($"타입: {merc.UnitData.Role}", EditorStyles.miniLabel);

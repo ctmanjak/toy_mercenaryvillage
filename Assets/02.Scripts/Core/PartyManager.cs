@@ -26,15 +26,53 @@ namespace Core
             DontDestroyOnLoad(gameObject);
         }
 
-        private void Start()
+        #region Save/Load Interface (SaveManager에서 호출)
+
+        public void ApplyLoadedParty(string[] partyIds)
         {
-            InitializePartyFromMercenaries();
+            if (partyIds == null || partyIds.Length == 0)
+            {
+                InitializePartyFromMercenaries();
+                return;
+            }
+
+            bool hasAnyMember = false;
+
+            for (int i = 0; i < partyIds.Length && i < PARTY_SIZE; i++)
+            {
+                if (!string.IsNullOrEmpty(partyIds[i]))
+                {
+                    var merc = PlayerResourceManager.Instance?.GetMercenaryById(partyIds[i]);
+                    if (merc != null)
+                    {
+                        _partySlots[i] = merc;
+                        hasAnyMember = true;
+                    }
+                }
+            }
+
+            if (hasAnyMember)
+            {
+                OnPartyChanged?.Invoke();
+                Debug.Log($"[PartyManager] 파티 복원 완료: {GetPartyCount()}명");
+            }
+            else
+            {
+                InitializePartyFromMercenaries();
+            }
         }
-        
+
+        public string[] GetPartyIdsForSave()
+        {
+            return _partySlots.Select(m => m?.Id).ToArray();
+        }
+
+        #endregion
+
         public void InitializePartyFromMercenaries()
         {
             if (PlayerResourceManager.Instance == null) return;
-            
+
             if (GetPartyCount() > 0) return;
 
             var mercenaries = PlayerResourceManager.Instance.GetAllMercenaries();
@@ -54,7 +92,7 @@ namespace Core
                 Debug.Log($"[PartyManager] 초기 파티 설정 완료: {slotIndex}명");
             }
         }
-        
+
         public bool SetPartySlot(int slotIndex, MercenaryData merc)
         {
             if (slotIndex < 0 || slotIndex >= PARTY_SIZE)
@@ -62,7 +100,7 @@ namespace Core
                 Debug.LogWarning($"[PartyManager] Invalid slot index: {slotIndex}");
                 return false;
             }
-            
+
             if (merc != null && IsInParty(merc))
             {
                 Debug.LogWarning($"[PartyManager] Mercenary already in party: {merc.DisplayName}");
@@ -71,6 +109,7 @@ namespace Core
 
             _partySlots[slotIndex] = merc;
             OnPartyChanged?.Invoke();
+            SaveManager.Instance?.SaveGame();
 
             if (merc != null)
             {
@@ -83,7 +122,7 @@ namespace Core
 
             return true;
         }
-        
+
         public void ClearPartySlot(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= PARTY_SIZE) return;
@@ -92,36 +131,37 @@ namespace Core
             {
                 _partySlots[slotIndex] = null;
                 OnPartyChanged?.Invoke();
+                SaveManager.Instance?.SaveGame();
             }
         }
-        
+
         public MercenaryData[] GetParty()
         {
             return (MercenaryData[])_partySlots.Clone();
         }
-        
+
         public MercenaryData GetPartySlot(int slotIndex)
         {
             if (slotIndex < 0 || slotIndex >= PARTY_SIZE) return null;
             return _partySlots[slotIndex];
         }
-        
+
         public int GetPartyCount()
         {
             return _partySlots.Count(m => m != null);
         }
-        
+
         public bool IsInParty(MercenaryData merc)
         {
             if (merc == null) return false;
             return _partySlots.Any(m => m != null && m.Id == merc.Id);
         }
-        
+
         public bool CanStartBattle()
         {
             return GetPartyCount() > 0;
         }
-        
+
         public void ClearAllSlots()
         {
             for (int i = 0; i < PARTY_SIZE; i++)
@@ -130,7 +170,7 @@ namespace Core
             }
             OnPartyChanged?.Invoke();
         }
-        
+
         public int GetFirstEmptySlot()
         {
             for (int i = 0; i < PARTY_SIZE; i++)
@@ -139,7 +179,7 @@ namespace Core
             }
             return -1;
         }
-        
+
         public bool AddToParty(MercenaryData merc)
         {
             if (merc == null) return false;
@@ -150,7 +190,7 @@ namespace Core
 
             return SetPartySlot(emptySlot, merc);
         }
-        
+
         public bool RemoveFromParty(MercenaryData merc)
         {
             if (merc == null) return false;
@@ -161,12 +201,13 @@ namespace Core
                 {
                     _partySlots[i] = null;
                     OnPartyChanged?.Invoke();
+                    SaveManager.Instance?.SaveGame();
                     return true;
                 }
             }
             return false;
         }
-        
+
         public int PartySize => PARTY_SIZE;
     }
 }

@@ -27,6 +27,14 @@ namespace Data
 
         [Tooltip("현재 경험치 (v0.1에서는 미사용)")]
         public int CurrentExp = 0;
+        
+        public MercenaryData(MercenarySaveData saveData)
+        {
+            Id = saveData.Id;
+            UnitDataId = saveData.UnitDataId;
+            CustomName = saveData.CustomName;
+            Level = saveData.Level;
+        }
 
         public MercenaryData(UnitData template)
         {
@@ -43,7 +51,7 @@ namespace Data
             UnitData = unitData;
         }
         
-        public float GetCurrentHP()
+        public float GetCurrentHealth()
             => UnitData.GetHealth(Level);
         
         public float GetCurrentAttackDamage()

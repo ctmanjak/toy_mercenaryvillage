@@ -1,72 +1,102 @@
 ## 목표
 
-선택한 용병의 상세 정보를 표시하고, 레벨업 기능을 제공한다.
+용병 목록, 파티 구성, 골드 등 플레이어 데이터를 JSON 파일로 저장/로드한다.
 
 ---
 
 ## 산출물
 
-- `MercenaryDetailPanel.cs`
-- 레벨업 UI 통합
+- `SaveManager.cs`
+- `SaveData.cs` (직렬화 클래스)
+- 저장 파일: `Application.persistentDataPath/save.json`
 
 ---
 
 ## 요구사항
 
-### 상세 정보 표시
+### 저장 데이터 구조
 
-- 용병 이름
-- 직업
-- 현재 레벨 / 최대 레벨 (예: Lv.3 / 10)
-- 스탯: HP, ATK, AtkSpd, Range
-- (선택) 초상화/아이콘
+```csharp
+[System.Serializable]
+public class SaveData
+{
+    public int gold;
+    public List<MercenarySaveData> mercenaries;
+    public string[] partyIds; // 파티 슬롯별 용병 ID
+}
 
-### 레벨업 기능
+[System.Serializable]
+public class MercenarySaveData
+{
+    public string id;
+    public string unitDataId; // UnitData 식별용
+    public string customName;
+    public int level;
+}
+```
 
-- 레벨업 버튼
-- 필요 골드 표시
-- 골드 부족 시 버튼 비활성화
-- 최대 레벨 도달 시 버튼 숨김
+### 저장 시점
 
-### 레벨업 비용 테이블
+- 자동 저장:
+    - 골드 변경 시
+    - 용병 추가/제거 시
+    - 파티 변경 시
+    - 레벨업 시
+- 수동 저장: 없음 (v0.1)
 
-| 레벨 | 비용 |
-| --- | --- |
-| 1→2 | 50G |
-| 2→3 | 75G |
-| 3→4 | 100G |
-| 4→5 | 150G |
-| 5→6 | 200G |
-| 6→7 | 300G |
-| 7→8 | 400G |
-| 8→9 | 500G |
-| 9→10 | 750G |
+### 로드 시점
 
-**공식**: `cost = 50 * (1 + (level-1) * 0.5)` 근사
+- 게임 시작 시 (PlayerData.Awake)
+- 저장 파일 없으면 초기 데이터 생성
 
 ---
 
 ## 설계 가이드
 
-### 레벨업 로직
+### SaveManager
 
 ```csharp
-public static int GetLevelUpCost(int currentLevel)
+public class SaveManager : MonoBehaviour
 {
-    int[] costs = { 50, 75, 100, 150, 200, 300, 400, 500, 750 };
-    if (currentLevel >= 10) return -1; // 최대 레벨
-    return costs[currentLevel - 1];
-}
-
-public bool TryLevelUp(MercenaryData merc)
-{
-    int cost = GetLevelUpCost(merc.level);
-    if (cost < 0 || !PlayerData.Instance.SpendGold(cost))
-        return false;
+    private static string SavePath => 
+        Path.Combine(Application.persistentDataPath, "save.json");
     
-    merc.level++;
-    OnMercenaryLevelUp?.Invoke(merc);
-    return true;
+    public static void Save(SaveData data)
+    {
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(SavePath, json);
+    }
+    
+    public static SaveData Load()
+    {
+        if (!File.Exists(SavePath))
+            return null;
+        
+        string json = File.ReadAllText(SavePath);
+        return JsonUtility.FromJson<SaveData>(json);
+    }
+    
+    public static void DeleteSave()
+    {
+        if (File.Exists(SavePath))
+            File.Delete(SavePath);
+    }
+}
+```
+
+### UnitData 참조 복원
+
+- UnitData는 ScriptableObject이므로 직접 직렬화 불가
+- unitDataId로 저장 → 로드 시 Resources나 레지스트리에서 검색
+
+```csharp
+// UnitDataRegistry.cs
+public class UnitDataRegistry : MonoBehaviour
+{
+    [SerializeField] private UnitData[] _allUnitData;
+    
+    public UnitData GetById(string id) =>
+        _allUnitData.FirstOrDefault(u => [u.id](http://u.id) == id);
 }
 ```
 
@@ -74,15 +104,14 @@ public bool TryLevelUp(MercenaryData merc)
 
 ## 수락 기준
 
-- [ ]  선택 용병 정보 표시
-- [ ]  레벨 적용된 스탯 표시
-- [ ]  레벨업 버튼 동작
-- [ ]  골드 차감 및 레벨 증가
-- [ ]  UI 즉시 갱신
-- [ ]  최대 레벨 처리
+- [ ]  게임 종료/재시작 시 데이터 유지
+- [ ]  골드 저장/로드
+- [ ]  용병 목록 저장/로드 (레벨 포함)
+- [ ]  파티 구성 저장/로드
+- [ ]  저장 파일 손상 시 초기화 처리
 
 ---
 
 ## 후속 태스크 연결
 
-- [S3] 파티 편성 UI
+- [S3] 용병 시스템 통합 플레이테스트

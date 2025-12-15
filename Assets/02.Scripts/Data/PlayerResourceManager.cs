@@ -16,9 +16,6 @@ namespace Data
         [SerializeField] private UnitData _tankerTemplate;
         [SerializeField] private UnitData _meleeDealerTemplate;
 
-        [Header("Unit Database")]
-        [SerializeField] private UnitDatabase _unitDatabase;
-
         private int _gold;
         public int Gold => _gold;
 
@@ -27,9 +24,6 @@ namespace Data
         public event Action<int> OnGoldChanged;
         public event Action<MercenaryData> OnMercenaryAdded;
         public event Action<MercenaryData> OnMercenaryRemoved;
-
-        private const string GOLD_KEY = "PlayerGold";
-        private const string MERCENARIES_KEY = "PlayerMercenaries";
 
         private void Awake()
         {
@@ -41,14 +35,41 @@ namespace Data
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            LoadData();
+            _gold = _startingGold;
         }
+
+        #region Save/Load Interface (SaveManager에서 호출)
+
+        public void ApplyLoadedData(int? gold, List<MercenaryData> mercenaries)
+        {
+            if (gold.HasValue && mercenaries != null && mercenaries.Count > 0)
+            {
+                _gold = gold.Value;
+                _mercenaries = mercenaries;
+                Debug.Log($"[PlayerResourceManager] 데이터 적용: Gold={_gold}, 용병={_mercenaries.Count}명");
+            }
+            else
+            {
+                InitializeNewGame();
+            }
+
+            OnGoldChanged?.Invoke(_gold);
+        }
+
+        public List<MercenarySaveData> GetMercenariesForSave()
+        {
+            return _mercenaries.Select(m => new MercenarySaveData(m)).ToList();
+        }
+
+        #endregion
+
+        #region Gold
 
         public void AddGold(int amount)
         {
             _gold += amount;
             OnGoldChanged?.Invoke(_gold);
-            SaveData();
+            SaveManager.Instance?.SaveGame();
         }
 
         public bool SpendGold(int amount)
@@ -57,34 +78,24 @@ namespace Data
 
             _gold -= amount;
             OnGoldChanged?.Invoke(_gold);
-            SaveData();
+            SaveManager.Instance?.SaveGame();
             return true;
         }
 
         public bool HasEnoughGold(int amount) => _gold >= amount;
-
-        private void SaveData()
-        {
-            PlayerPrefs.SetInt(GOLD_KEY, _gold);
-            PlayerPrefs.Save();
-        }
-
-        private void LoadData()
-        {
-            _gold = PlayerPrefs.GetInt(GOLD_KEY, _startingGold);
-            LoadMercenaries();
-        }
 
         [ContextMenu("Reset Gold")]
         public void ResetGold()
         {
             _gold = _startingGold;
             OnGoldChanged?.Invoke(_gold);
-            SaveData();
+            SaveManager.Instance?.SaveGame();
         }
 
+        #endregion
+
         #region Mercenary System
-    
+
         public void AddMercenary(MercenaryData merc)
         {
             if (merc == null) return;
@@ -92,9 +103,9 @@ namespace Data
 
             _mercenaries.Add(merc);
             OnMercenaryAdded?.Invoke(merc);
-            SaveMercenaries();
+            SaveManager.Instance?.SaveGame();
         }
-    
+
         public void RemoveMercenary(MercenaryData merc)
         {
             if (merc == null) return;
@@ -104,22 +115,31 @@ namespace Data
             {
                 _mercenaries.Remove(existing);
                 OnMercenaryRemoved?.Invoke(existing);
-                SaveMercenaries();
+                SaveManager.Instance?.SaveGame();
             }
         }
-    
+
         public MercenaryData GetMercenaryById(string id)
         {
             return _mercenaries.FirstOrDefault(m => m.Id == id);
         }
-    
+
         public List<MercenaryData> GetAllMercenaries()
         {
             return new List<MercenaryData>(_mercenaries);
         }
-    
+
         public int MercenaryCount => _mercenaries.Count;
-    
+
+        public void SaveMercenaries()
+        {
+            SaveManager.Instance?.SaveGame();
+        }
+
+        #endregion
+
+        #region Private Methods
+
         private void InitializeNewGame()
         {
             _gold = _startingGold;
@@ -137,86 +157,23 @@ namespace Data
                 _mercenaries.Add(meleeDealer);
             }
 
-            SaveData();
-            SaveMercenaries();
-
-            Debug.Log($"[PlayerResourceManager] 초기 용병 지급 완료: {_mercenaries.Count}명");
-        }
-
-        public void SaveMercenaries()
-        {
-            var json = JsonUtility.ToJson(new MercenaryListWrapper { Mercenaries = _mercenaries });
-            PlayerPrefs.SetString(MERCENARIES_KEY, json);
-            PlayerPrefs.Save();
-        }
-
-        private void LoadMercenaries()
-        {
-            var json = PlayerPrefs.GetString(MERCENARIES_KEY, "");
-            if (string.IsNullOrEmpty(json))
-            {
-                InitializeNewGame();
-                return;
-            }
-
-            try
-            {
-                var wrapper = JsonUtility.FromJson<MercenaryListWrapper>(json);
-                _mercenaries = wrapper?.Mercenaries ?? new List<MercenaryData>();
-                
-                foreach (var merc in _mercenaries)
-                {
-                    RestoreUnitDataReference(merc);
-                }
-
-                if (_mercenaries.Count == 0)
-                {
-                    InitializeNewGame();
-                }
-            }
-            catch
-            {
-                InitializeNewGame();
-            }
-        }
-
-        private void RestoreUnitDataReference(MercenaryData merc)
-        {
-            if (string.IsNullOrEmpty(merc.UnitDataId)) return;
-
-            var unitData = FindUnitDataById(merc.UnitDataId);
-            if (unitData != null)
-            {
-                merc.RestoreUnitData(unitData);
-            }
-            else
-            {
-                Debug.LogWarning($"[PlayerResourceManager] UnitData not found for ID: {merc.UnitDataId}");
-            }
-        }
-
-        private UnitData FindUnitDataById(string unitId)
-        {
-            if (_unitDatabase == null) return null;
-            return _unitDatabase.GetById(unitId);
-        }
-
-        [ContextMenu("Reset All Data (Gold + Mercenaries)")]
-        public void ResetAllData()
-        {
-            PlayerPrefs.DeleteKey(GOLD_KEY);
-            PlayerPrefs.DeleteKey(MERCENARIES_KEY);
-            InitializeNewGame();
-            OnGoldChanged?.Invoke(_gold);
-            Debug.Log("[PlayerResourceManager] 모든 데이터 초기화 완료");
-        }
-
-        [Serializable]
-        private class MercenaryListWrapper
-        {
-            public List<MercenaryData> Mercenaries;
+            Debug.Log($"[PlayerResourceManager] 새 게임 시작: Gold={_gold}, 초기 용병={_mercenaries.Count}명");
         }
 
         #endregion
+
+        [ContextMenu("Reset All Data")]
+        public void ResetAllData()
+        {
+            SaveManager.Instance?.DeleteSave();
+            InitializeNewGame();
+            OnGoldChanged?.Invoke(_gold);
+
+            Core.PartyManager.Instance?.ClearAllSlots();
+
+            SaveManager.Instance?.SaveGame();
+
+            Debug.Log("[PlayerResourceManager] 모든 데이터 초기화 완료");
+        }
     }
 }
