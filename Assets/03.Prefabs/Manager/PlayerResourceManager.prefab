@@ -47,3 +47,4 @@ MonoBehaviour:
   _startingGold: 100
   _tankerTemplate: {fileID: 11400000, guid: adf7e7c8c4e6443b5881abe53f07c256, type: 2}
   _meleeDealerTemplate: {fileID: 11400000, guid: 0374724413d75470aba00ea056b733b7, type: 2}
+  _unitDatabase: {fileID: 11400000, guid: ecec40702fed84fac94ba082c8de0377, type: 2}

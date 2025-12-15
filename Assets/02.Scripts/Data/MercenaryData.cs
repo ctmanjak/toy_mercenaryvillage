@@ -12,7 +12,10 @@ namespace Data
         public string Id;
 
         [Tooltip("기반 데이터 (SO 참조)")]
-        public UnitData UnitData;
+        [NonSerialized] public UnitData UnitData;
+
+        [Tooltip("UnitData ID (저장용)")]
+        public string UnitDataId;
 
         [Tooltip("플레이어 지정 이름 (선택)")]
         public string CustomName;
@@ -29,9 +32,15 @@ namespace Data
         {
             Id = Guid.NewGuid().ToString();
             UnitData = template;
+            UnitDataId = template.UnitId;
             CustomName = template.UnitName;
             Level = 1;
             CurrentExp = 0;
+        }
+
+        public void RestoreUnitData(UnitData unitData)
+        {
+            UnitData = unitData;
         }
         
         public float GetCurrentHP()
