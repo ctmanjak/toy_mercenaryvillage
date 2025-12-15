@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/01.Scenes/GuildHouseScene.unity
     guid: e506353b18db74164b9c5f71e182beb2
+  - enabled: 1
+    path: Assets/01.Scenes/TavernScene.unity
+    guid: d7abdba67b9444f4cb5f9335489807e6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -36,6 +36,11 @@ namespace Core
             SceneManager.LoadScene("GuildHouseScene");
         }
 
+        public void GoToTavern()
+        {
+            SceneManager.LoadScene("TavernScene");
+        }
+
         public void StartBattle(StageData stage)
         {
             CurrentStage = stage;

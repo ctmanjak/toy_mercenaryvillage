@@ -10,6 +10,7 @@ namespace UI
         [Header("Building Buttons")]
         [SerializeField] private Button _dungeonButton;
         [SerializeField] private Button _guildButton;
+        [SerializeField] private Button _tavernButton;
 
         [Header("Popups")]
         [SerializeField] private GameObject _comingSoonPopup;
@@ -26,6 +27,11 @@ namespace UI
             if (_guildButton != null)
             {
                 _guildButton.onClick.AddListener(OnGuildButtonClicked);
+            }
+
+            if (_tavernButton != null)
+            {
+                _tavernButton.onClick.AddListener(OnTavernButtonClicked);
             }
 
             if (_comingSoonCloseButton != null)
@@ -48,6 +54,11 @@ namespace UI
                 _guildButton.onClick.RemoveListener(OnGuildButtonClicked);
             }
 
+            if (_tavernButton != null)
+            {
+                _tavernButton.onClick.RemoveListener(OnTavernButtonClicked);
+            }
+
             if (_comingSoonCloseButton != null)
             {
                 _comingSoonCloseButton.onClick.RemoveListener(HideComingSoonPopup);
@@ -62,6 +73,11 @@ namespace UI
         private void OnGuildButtonClicked()
         {
             GameManager.Instance.GoToGuildHouse();
+        }
+
+        private void OnTavernButtonClicked()
+        {
+            GameManager.Instance.GoToTavern();
         }
 
         private void ShowComingSoonPopup(string buildingName)
