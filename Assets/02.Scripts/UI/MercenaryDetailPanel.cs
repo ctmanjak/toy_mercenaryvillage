@@ -40,8 +40,6 @@ namespace UI
             {
                 PlayerResourceManager.Instance.OnGoldChanged += HandleGoldChanged;
             }
-            
-            Hide();
         }
         
         private void OnDestroy()

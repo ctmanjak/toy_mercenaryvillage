@@ -38,6 +38,12 @@ namespace UI
             HideDetailPanel();
         }
 
+        private void OnEnable()
+        {
+            RefreshCandidates();
+            HideDetailPanel();
+        }
+
         private void OnDestroy()
         {
             UnsubscribeEvents();
@@ -271,7 +277,7 @@ namespace UI
 
         private void OnBackButtonClicked()
         {
-            GameManager.Instance.GoToTown();
+            TownUIManager.Instance?.ShowTown();
         }
 
         private string GetRoleDisplayText(UnitRole role)

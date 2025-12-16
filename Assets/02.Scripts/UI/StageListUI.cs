@@ -43,6 +43,15 @@ namespace UI
             OnStageSelected?.Invoke(stage);
         }
 
+        public void ClearSelection()
+        {
+            foreach (var btn in _buttons)
+            {
+                btn.SetSelected(false);
+            }
+            _selectedButton = null;
+        }
+
         private void OnDestroy()
         {
             foreach (var button in _buttons)

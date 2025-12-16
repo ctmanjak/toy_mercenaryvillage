@@ -1,4 +1,3 @@
-using Core;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -67,17 +66,17 @@ namespace UI
 
         private void OnDungeonButtonClicked()
         {
-            GameManager.Instance.GoToDungeonSelect();
+            TownUIManager.Instance?.ShowDungeonSelect();
         }
 
         private void OnGuildButtonClicked()
         {
-            GameManager.Instance.GoToGuildHouse();
+            TownUIManager.Instance?.ShowGuild();
         }
 
         private void OnTavernButtonClicked()
         {
-            GameManager.Instance.GoToTavern();
+            TownUIManager.Instance?.ShowTavern();
         }
 
         private void ShowComingSoonPopup(string buildingName)

@@ -1,6 +1,6 @@
-using Core;
 using UnityEngine;
 using UnityEngine.UI;
+using Core;
 
 namespace UI
 {
@@ -25,23 +25,38 @@ namespace UI
             {
                 _backButton.onClick.AddListener(OnBackButtonClicked);
             }
-
-            // 용병 선택 이벤트 연결
+            
             if (_mercenaryListUI != null)
             {
                 _mercenaryListUI.OnMercenarySelected += HandleMercenarySelected;
             }
-
-            // 레벨업 이벤트 연결 (목록 갱신용)
+            
             if (MercenaryManager.Instance != null)
             {
                 MercenaryManager.Instance.OnMercenaryLevelUp += HandleMercenaryLevelUp;
             }
-
-            // 파티 변경 시 용병 목록 갱신 (배지 업데이트)
+            
             if (_partyFormationUI != null)
             {
                 _partyFormationUI.OnPartyUpdated += HandlePartyUpdated;
+            }
+        }
+
+        private void OnEnable()
+        {
+            if (_mercenaryListUI != null)
+            {
+                _mercenaryListUI.Refresh();
+            }
+
+            if (_mercenaryDetailPanel != null)
+            {
+                _mercenaryDetailPanel.Hide();
+            }
+
+            if (_partyFormationUI != null)
+            {
+                _partyFormationUI.RefreshUI();
             }
         }
 
@@ -74,8 +89,7 @@ namespace UI
             {
                 _mercenaryDetailPanel.Show(mercenary);
             }
-
-            // 파티 편성 UI에 선택된 용병 전달
+            
             if (_partyFormationUI != null)
             {
                 _partyFormationUI.OnMercenarySelected(mercenary);
@@ -84,18 +98,15 @@ namespace UI
 
         private void HandleMercenaryLevelUp(Data.MercenaryData mercenary)
         {
-            // 목록 갱신 (레벨 텍스트 업데이트)
             if (_mercenaryListUI != null)
             {
                 _mercenaryListUI.Refresh();
-                // 같은 용병 다시 선택하여 상세 패널 유지
                 _mercenaryListUI.SelectMercenary(mercenary);
             }
         }
 
         private void HandlePartyUpdated()
         {
-            // 파티 변경 시 용병 목록 새로고침 (배지 상태 업데이트)
             if (_mercenaryListUI != null)
             {
                 _mercenaryListUI.Refresh();
@@ -109,7 +120,7 @@ namespace UI
                 CommonPopup.Instance?.ShowAlert("파티를 편성해야 마을로 돌아갈 수 있습니다.");
                 return;
             }
-            GameManager.Instance.GoToTown();
+            TownUIManager.Instance?.ShowTown();
         }
     }
 }

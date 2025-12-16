@@ -59,6 +59,23 @@ namespace UI
             UpdateStartButton();
         }
 
+        private void OnEnable()
+        {
+            _selectedStage = null;
+
+            if (_stageInfoPanel != null)
+            {
+                _stageInfoPanel.SetActive(false);
+            }
+
+            if (_stageListUI != null)
+            {
+                _stageListUI.ClearSelection();
+            }
+
+            UpdateStartButton();
+        }
+
         private void OnDestroy()
         {
             if (_backButton != null)
@@ -124,7 +141,7 @@ namespace UI
 
         private void OnBackButtonClicked()
         {
-            GameManager.Instance.GoToTown();
+            TownUIManager.Instance?.ShowTown();
         }
 
         private void OnStartBattleClicked()

@@ -26,21 +26,6 @@ namespace Core
             SceneManager.LoadScene("TownScene");
         }
 
-        public void GoToDungeonSelect()
-        {
-            SceneManager.LoadScene("DungeonSelectScene");
-        }
-
-        public void GoToGuildHouse()
-        {
-            SceneManager.LoadScene("GuildHouseScene");
-        }
-
-        public void GoToTavern()
-        {
-            SceneManager.LoadScene("TavernScene");
-        }
-
         public void StartBattle(StageData stage)
         {
             CurrentStage = stage;

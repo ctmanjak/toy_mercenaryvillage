@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7026495935543331968
+--- !u!1 &4440451770140325846
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,42 +8,43 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2672376036517360341}
-  - component: {fileID: 5917477996938518893}
+  - component: {fileID: 5435658031882080991}
+  - component: {fileID: 9129164924957154918}
   m_Layer: 0
-  m_Name: PlayerResourceManager
+  m_Name: TownUIManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2672376036517360341
+--- !u!4 &5435658031882080991
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7026495935543331968}
+  m_GameObject: {fileID: 4440451770140325846}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.37052, y: 0.67961, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5917477996938518893
+--- !u!114 &9129164924957154918
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7026495935543331968}
+  m_GameObject: {fileID: 4440451770140325846}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 887139b58303f4c7eae77781d1245ac9, type: 3}
+  m_Script: {fileID: 11500000, guid: a74e46b63e7304bfd8e1f7660205fe6d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerResourceManager
-  _startingGold: 0
-  _tankerTemplate: {fileID: 11400000, guid: adf7e7c8c4e6443b5881abe53f07c256, type: 2}
-  _meleeDealerTemplate: {fileID: 11400000, guid: 0374724413d75470aba00ea056b733b7, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::UI.TownUIManager
+  _townPanel: {fileID: 0}
+  _guildPanel: {fileID: 0}
+  _tavernPanel: {fileID: 0}
+  _dungeonSelectPanel: {fileID: 0}
