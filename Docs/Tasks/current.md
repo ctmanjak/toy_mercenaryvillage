@@ -1,123 +1,130 @@
 ## 목표
 
-빈 파티 상태에서 게임 진행을 차단하고, 재사용 가능한 공통 경고 팝업 시스템을 구현한다.
+기존 별도 씬(GuildHouseScene, TavernScene)을 TownScene 내 패널로 통합하여 씬 수를 줄이고 마을 내 전환을 빠르게 한다.
+
+---
+
+## 배경
+
+- 현재 5개 씬: TownScene, GuildHouseScene, TavernScene, DungeonSelectScene, BattleScene
+- 길드하우스/술집은 풀스크린 UI일 뿐, 별도 게임 로직 없음
+- 마을 ↔ 건물 전환이 잦은데 매번 씬 로드는 과함
 
 ---
 
 ## 산출물
 
-- `CommonPopup.cs` / `CommonPopup.prefab` (공통 팝업)
-- `PartyValidator.cs` (파티 검증 유틸)
+- `TownUIManager.cs` (패널 전환 관리)
+- TownScene 내 GuildPanel, TavernPanel 통합
+- GuildHouseScene.unity, TavernScene.unity 삭제
+- Build Settings 업데이트 (3개 씬만 유지)
 
 ---
 
 ## 요구사항
 
-### 1. 공통 경고 팝업 시스템
+### 패널 구조
 
-- 메시지 + 확인 버튼 (기본)
-- 메시지 + 확인/취소 버튼 (선택)
-- 씬 전환 시에도 유지되는 싱글톤 or DontDestroyOnLoad
-- 콜백 지원 (확인/취소 시 액션 실행)
+```
+TownScene
+├─ Main Camera
+├─ Canvas
+│   ├─ TownPanel (기본 마을 화면)
+│   │   ├─ Background
+│   │   ├─ BuildingButtons (던전/길드/술집)
+│   │   └─ GoldUI
+│   ├─ GuildPanel (비활성 상태로 시작)
+│   │   ├─ Header (뒤로가기, 타이틀, 골드)
+│   │   ├─ MercenaryListUI
+│   │   ├─ MercenaryDetailPanel
+│   │   └─ PartySlotUI
+│   └─ TavernPanel (비활성 상태로 시작)
+│       ├─ Header
+│       ├─ CandidateListUI
+│       └─ HireDetailPanel
+└─ EventSystem
+```
 
-### 2. GuildHouseScene - 뒤로가기 차단
+### 전환 로직
 
-- 파티가 비어있으면 마을로 복귀 불가
-- "파티를 편성해야 마을로 돌아갈 수 있습니다" 팝업 표시
-- 최소 1명 이상 편성 시 정상 복귀
+```csharp
+public class TownUIManager : MonoBehaviour
+{
+    [SerializeField] private GameObject _townPanel;
+    [SerializeField] private GameObject _guildPanel;
+    [SerializeField] private GameObject _tavernPanel;
+    
+    private GameObject _currentPanel;
+    
+    private void Start()
+    {
+        ShowTown();
+    }
+    
+    public void ShowTown()
+    {
+        SwitchPanel(_townPanel);
+    }
+    
+    public void ShowGuild()
+    {
+        SwitchPanel(_guildPanel);
+    }
+    
+    public void ShowTavern()
+    {
+        SwitchPanel(_tavernPanel);
+    }
+    
+    private void SwitchPanel(GameObject panel)
+    {
+        _townPanel.SetActive(panel == _townPanel);
+        _guildPanel.SetActive(panel == _guildPanel);
+        _tavernPanel.SetActive(panel == _tavernPanel);
+        _currentPanel = panel;
+    }
+}
+```
 
-### 3. DungeonSelectScene - 전투 시작 차단 (이중 안전)
+### GameManager 수정
 
-- TownScene → DungeonSelectScene 직행 경로 대비
-- 빈 파티로 전투 시작 버튼 클릭 시 차단
-- "파티에 용병이 없습니다. 길드 하우스에서 편성해주세요" 팝업 표시
+```csharp
+// 기존 (삭제)
+public void LoadGuildHouse() => SceneManager.LoadScene("GuildHouseScene");
+public void LoadTavern() => SceneManager.LoadScene("TavernScene");
+
+// 변경 (TownUIManager 참조로 대체하거나 이벤트 사용)
+```
 
 ---
 
-## 설계 가이드
+## 작업 순서
 
-### CommonPopup 구조
-
-```csharp
-public class CommonPopup : MonoBehaviour
-{
-    public static CommonPopup Instance;
-    
-    [SerializeField] private GameObject _popupPanel;
-    [SerializeField] private TMP_Text _messageText;
-    [SerializeField] private Button _confirmButton;
-    [SerializeField] private Button _cancelButton;
-    
-    private System.Action _onConfirm;
-    private System.Action _onCancel;
-    
-    // 경고 팝업 (확인만)
-    public void ShowAlert(string message, System.Action onConfirm = null)
-    {
-        _messageText.text = message;
-        _confirmButton.gameObject.SetActive(true);
-        _cancelButton.gameObject.SetActive(false);
-        _onConfirm = onConfirm;
-        _popupPanel.SetActive(true);
-    }
-    
-    // 확인/취소 팝업
-    public void ShowConfirm(string message, System.Action onConfirm, System.Action onCancel = null)
-    {
-        _messageText.text = message;
-        _confirmButton.gameObject.SetActive(true);
-        _cancelButton.gameObject.SetActive(true);
-        _onConfirm = onConfirm;
-        _onCancel = onCancel;
-        _popupPanel.SetActive(true);
-    }
-}
-```
-
-### PartyValidator 유틸
-
-```csharp
-public static class PartyValidator
-{
-    public static bool HasAnyMember()
-    {
-        return PartyManager.Instance.GetPartyMembers().Any(m => m != null);
-    }
-    
-    public static int GetMemberCount()
-    {
-        return PartyManager.Instance.GetPartyMembers().Count(m => m != null);
-    }
-}
-```
-
-### 사용 예시 (GuildHouseScene)
-
-```csharp
-public void OnBackButtonClick()
-{
-    if (!PartyValidator.HasAnyMember())
-    {
-        CommonPopup.Instance.ShowAlert("파티를 편성해야 마을로 돌아갈 수 있습니다.");
-        return;
-    }
-    GameManager.Instance.GoToTown();
-}
-```
+1. TownUIManager.cs 생성
+2. TownScene에 GuildPanel, TavernPanel 빈 오브젝트 추가
+3. 기존 GuildHouseScene의 UI 계층을 GuildPanel 하위로 이동
+4. 기존 TavernScene의 UI 계층을 TavernPanel 하위로 이동
+5. 버튼 연결 수정 (씬 전환 → 패널 전환)
+6. 뒤로가기 버튼 수정 (TownUIManager.ShowTown 호출)
+7. GuildHouseScene.unity, TavernScene.unity 삭제
+8. Build Settings에서 제거
 
 ---
 
 ## 수락 기준
 
-- [ ]  CommonPopup 싱글톤 구현 및 DontDestroyOnLoad 설정
-- [ ]  ShowAlert / ShowConfirm 메서드 동작
-- [ ]  GuildHouseScene: 빈 파티 시 뒤로가기 차단 + 팝업
-- [ ]  DungeonSelectScene: 빈 파티 시 전투 시작 차단 + 팝업
-- [ ]  정상 파티 상태에서는 기존 플로우 유지
+- [ ]  TownScene에서 길드하우스 버튼 → GuildPanel 표시
+- [ ]  TownScene에서 술집 버튼 → TavernPanel 표시
+- [ ]  각 패널에서 뒤로가기 → TownPanel 표시
+- [ ]  기존 기능 정상 동작 (용병 목록, 고용 등)
+- [ ]  GoldUI가 모든 패널에서 표시
+- [ ]  Build Settings에 3개 씬만 존재
+- [ ]  GuildHouseScene.unity, TavernScene.unity 삭제됨
 
 ---
 
-## 참고
+## 주의사항
 
-- 길드 하우스 진입 시점에는 이미 초기 용병 2명이 파티에 배치되어 있음
-- 사용자가 모두 제거하고 나가려는 경우를 방지하는 목적
+- 기존 UI 프리팹/스크립트는 최대한 재사용
+- 씬 전환 관련 코드만 패널 전환으로 변경
+- DontDestroyOnLoad 객체 정리 확인
