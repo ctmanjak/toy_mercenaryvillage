@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8de2d66d20dae49cc8db4d3743fc7759, type: 3}
+  m_Name: Expedition_Forest
+  m_EditorClassIdentifier: Assembly-CSharp::Data.ExpeditionData
+  ExpeditionId: forest
+  ExpeditionName: "\uC232"
+  Description: "\uC6B8\uCC3D\uD55C \uC232 \uC18D\uC5D0\uC11C \uD3BC\uCCD0\uC9C0\uB294
+    \uB450 \uBC88\uC9F8 \uC6D0\uC815\uC785\uB2C8\uB2E4."
+  Icon: {fileID: 0}
+  RecommendedPower: 280
+  Battles:
+  - {fileID: 11400000, guid: 9e00d303329aa4620ab47d4b8cdc5a71, type: 2}
+  - {fileID: 11400000, guid: ed2052e69703c49aba09e8123c0df4d2, type: 2}
+  - {fileID: 11400000, guid: b46fc7797895041aa9fe18672e19b12f, type: 2}
+  - {fileID: 11400000, guid: d9d5479ae49f04269baf823a53fb40fb, type: 2}
+  - {fileID: 11400000, guid: 2f2a6f56bcc6f432ca7ef4c6d15a32bc, type: 2}
+  - {fileID: 11400000, guid: 2f2a6f56bcc6f432ca7ef4c6d15a32bc, type: 2}
+  CompletionBonus: 120
+  FirstClearBonus: 200
+  UnlockRequirement: {fileID: 11400000, guid: 02fa57fc705764fc0b74c62d8017ae9f, type: 2}
