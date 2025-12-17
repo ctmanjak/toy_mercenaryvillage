@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core;
 using Data;
@@ -26,6 +27,9 @@ namespace Battle
 
         public BattlePhase Phase => _phase;
         public BattleResult BattleResult => _battleResult;
+        public StageData CurrentStage => _currentStage;
+
+        public event Action<bool, int> OnBattleEnd;
 
         private void Awake()
         {
@@ -97,17 +101,10 @@ namespace Battle
             if (result == BattleResult.Victory && _currentStage != null)
             {
                 reward = _currentStage.GoldReward;
-
-                if (PlayerResourceManager.Instance != null)
-                {
-                    PlayerResourceManager.Instance.AddGold(reward);
-                }
             }
 
-            if (_resultUI != null)
-            {
-                _resultUI.Show(result, reward);
-            }
+            bool isVictory = result == BattleResult.Victory;
+            OnBattleEnd?.Invoke(isVictory, reward);
 
             Debug.Log($"[BattleManager] Battle ended: {result}, Reward: {reward}G");
         }

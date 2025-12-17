@@ -1,59 +1,62 @@
 ## 목표
 
-원정 내 연속 전투를 관리하는 ExpeditionManager를 구현한다.
+기존 던전 선택 화면을 원정 선택 화면으로 변경한다.
 
 ---
 
 ## 산출물
 
-- ExpeditionManager.cs
-- 기존 BattleManager와 연동
+- ExpeditionSelectUI.cs (기존 StageSelectUI 수정 또는 대체)
+- ExpeditionCard.cs (원정 카드 UI)
+- 원정 선택 씬 업데이트
 
 ---
 
 ## 요구사항
 
-### 핵심 로직
+### UI 구성
 
-- 현재 원정 데이터 보관
-- 현재 전투 인덱스 추적
-- 누적 골드 계산
-- 전투 결과 처리 (BattleManager 콜백)
+- 원정 목록 세로 스크롤 또는 카드 배열
+- 각 원정 카드에 표시:
+    - 원정 이름 + 아이콘
+    - 전투 수
+    - 권장 전투력
+    - 예상 보상 범위
+    - 완료 횟수
 
-### 주요 메서드
+### 해금/잠금 상태 UI
 
-- StartExpedition(ExpeditionData): 원정 시작
-- LoadNextBattle(): 다음 전투 로드
-- OnBattleEnd(victory, gold): 전투 종료 처리
-- ReturnToTown(): 중도 귀환
+- **잠금 상태**: 회색 처리 + 자물쇠 아이콘
+- 해금 조건 표시 (ex: "초원 원정 완료 시 해금")
+- 잠금 원정 클릭 시 해금 조건 안내 팝업
+- **해금 상태**: 정상 표시, 선택 가능
 
-### 전투 종료 처리
+### 해금 체크 로직
 
-- 승리 시: 골드 누적 → 마지막 전투면 결과화면, 아니면 계속/귀환 선택
-- 패배 시: 원정 중단 → 결과 화면 (누적 골드 유지)
+- ExpeditionData.unlockRequirement 확인
+- unlockRequirement == null → 기본 해금
+- unlockRequirement != null → 해당 원정 첫 완료 여부 확인
 
----
+### 전투력 경고
 
-## 설계 가이드
+- 파티 전투력 < 권장 전투력 시 ⚠️ 표시
+- 경고만 표시하고 진입은 허용
 
-### 상태 관리
+### 원정 선택 흐름
 
-- currentExpedition: ExpeditionData
-- currentBattleIndex: int
-- totalGoldEarned: int
-- isExpeditionActive: bool
-
-### BattleManager 연동
-
-- BattleManager.OnBattleEnd 이벤트 구독
-- StageData는 ExpeditionData.battles[index]에서 가져옴
+1. 원정 카드 클릭
+2. 잠금 상태면 → 해금 조건 안내 팝업
+3. 해금 상태면 → 원정 상세 팝업 (설명 + 파티 확인)
+4. "출발" 버튼 → ExpeditionManager로 연결
 
 ---
 
 ## 수락 기준
 
-- 원정 시작 시 첫 전투 로드
-- 전투 승리 시 골드 누적
-- 마지막 전투 승리 시 원정 완료 처리
-- 전투 패배 시 원정 중단 (골드 유지)
-- BattleManager와 정상 연동
+- 원정 목록 UI 표시
+- 해금된 원정 정상 표시
+- 잠금된 원정 회색 + 자물쇠 표시
+- 잠금 원정 클릭 시 해금 조건 안내
+- 전투력 부족 경고 표시
+- 원정 선택 시 상세 팝업
+- 출발 버튼 동작
