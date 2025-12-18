@@ -2,9 +2,12 @@ using System;
 using Battle;
 using Data;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Core
 {
+    public enum ExpeditionEndReason { Complete, Failed, Retreat }
+
     public class ExpeditionManager : MonoBehaviour
     {
         public static ExpeditionManager Instance { get; private set; }
@@ -22,9 +25,9 @@ namespace Core
         public int TotalBattles => _currentExpedition?.Battles?.Count ?? 0;
         public bool IsLastBattle => _currentBattleIndex >= TotalBattles - 1;
 
-        public event Action<ExpeditionData, int> OnExpeditionComplete;
-        public event Action<ExpeditionData, int> OnExpeditionFailed;
-        public event Action<int, int, int> OnBattleComplete; // battleIndex, gold, totalGold
+        public event Action<ExpeditionData, ExpeditionEndReason, int> OnExpeditionEnd;
+        public event Action<int, int, int, int, bool> OnBattleVictory;
+        public event Action<int, int, int> OnBattleDefeat;
 
         private void Awake()
         {
@@ -34,17 +37,42 @@ namespace Core
                 return;
             }
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
 
         private void OnEnable()
         {
-            if (BattleManager.Instance != null)
-            {
-                BattleManager.Instance.OnBattleEnd += HandleBattleEnd;
-            }
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            UnsubscribeFromBattleManager();
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name == "BattleScene" && _isExpeditionActive)
+            {
+                Invoke(nameof(SubscribeToBattleManager), 0.1f);
+            }
+        }
+
+        private void SubscribeToBattleManager()
+        {
+            if (BattleManager.Instance != null)
+            {
+                BattleManager.Instance.OnBattleEnd += HandleBattleEnd;
+                Debug.Log("[ExpeditionManager] Subscribed to BattleManager");
+            }
+            else
+            {
+                Debug.LogWarning("[ExpeditionManager] BattleManager.Instance is null");
+            }
+        }
+
+        private void UnsubscribeFromBattleManager()
         {
             if (BattleManager.Instance != null)
             {
@@ -96,14 +124,15 @@ namespace Core
                 return;
             }
 
-            if (BattleManager.Instance != null)
+            Debug.Log($"[ExpeditionManager] Loading battle {_currentBattleIndex + 1}/{TotalBattles}: {stage.StageName}");
+            
+            if (GameManager.Instance != null)
             {
-                BattleManager.Instance.StartBattle(stage);
-                Debug.Log($"[ExpeditionManager] Loading battle {_currentBattleIndex + 1}/{TotalBattles}: {stage.StageName}");
+                GameManager.Instance.StartBattle(stage);
             }
             else
             {
-                Debug.LogError("[ExpeditionManager] BattleManager.Instance is null");
+                Debug.LogError("[ExpeditionManager] GameManager.Instance is null");
             }
         }
 
@@ -130,79 +159,62 @@ namespace Core
         {
             if (!_isExpeditionActive) return;
 
+            UnsubscribeFromBattleManager();
+
             if (victory)
             {
                 _totalGoldEarned += goldReward;
-                OnBattleComplete?.Invoke(_currentBattleIndex, goldReward, _totalGoldEarned);
 
                 Debug.Log($"[ExpeditionManager] Battle {_currentBattleIndex + 1} won! Gold: +{goldReward} (Total: {_totalGoldEarned})");
 
-                if (IsLastBattle)
-                {
-                    CompleteExpedition();
-                }
+                OnBattleVictory?.Invoke(_currentBattleIndex, TotalBattles, goldReward, _totalGoldEarned, IsLastBattle);
             }
             else
             {
-                FailExpedition();
+                Debug.Log($"[ExpeditionManager] Battle {_currentBattleIndex + 1} lost.");
+                OnBattleDefeat?.Invoke(_currentBattleIndex, TotalBattles, _totalGoldEarned);
             }
         }
 
-        private void CompleteExpedition()
+        public void CompleteExpedition() => EndExpedition(ExpeditionEndReason.Complete);
+        public void FailExpedition() => EndExpedition(ExpeditionEndReason.Failed);
+        public void ReturnToTown() => EndExpedition(ExpeditionEndReason.Retreat);
+
+        private void EndExpedition(ExpeditionEndReason reason)
         {
             if (!_isExpeditionActive) return;
 
-            int completionBonus = _currentExpedition.CompletionBonus;
-            int totalReward = _totalGoldEarned + completionBonus;
-
-            if (PlayerResourceManager.Instance != null)
+            int totalGold = _totalGoldEarned;
+            
+            if (reason == ExpeditionEndReason.Complete)
             {
-                PlayerResourceManager.Instance.AddGold(totalReward);
+                totalGold += _currentExpedition.CompletionBonus;
+
+                if (ExpeditionProgressManager.Instance != null)
+                {
+                    ExpeditionProgressManager.Instance.RecordCompletion(_currentExpedition.ExpeditionId);
+
+                    if (ExpeditionProgressManager.Instance.TryClaimFirstClearBonus(_currentExpedition, out int bonus))
+                    {
+                        totalGold += bonus;
+                    }
+                }
+            }
+            
+            if (totalGold > 0)
+            {
+                PlayerResourceManager.Instance?.AddGold(totalGold);
             }
 
-            Debug.Log($"[ExpeditionManager] Expedition complete! Total gold: {totalReward} (Battles: {_totalGoldEarned} + Bonus: {completionBonus})");
+            Debug.Log($"[ExpeditionManager] Expedition ended: {reason}, Gold: {totalGold}");
 
-            var completedExpedition = _currentExpedition;
-            _isExpeditionActive = false;
-
-            OnExpeditionComplete?.Invoke(completedExpedition, totalReward);
-        }
-
-        private void FailExpedition()
-        {
-            if (!_isExpeditionActive) return;
-
-            if (PlayerResourceManager.Instance != null && _totalGoldEarned > 0)
-            {
-                PlayerResourceManager.Instance.AddGold(_totalGoldEarned);
-            }
-
-            Debug.Log($"[ExpeditionManager] Expedition failed at battle {_currentBattleIndex + 1}. Gold earned: {_totalGoldEarned}");
-
-            var failedExpedition = _currentExpedition;
-            int earnedGold = _totalGoldEarned;
-            _isExpeditionActive = false;
-
-            OnExpeditionFailed?.Invoke(failedExpedition, earnedGold);
-        }
-
-        public void ReturnToTown()
-        {
-            if (!_isExpeditionActive)
-            {
-                Debug.LogWarning("[ExpeditionManager] No active expedition to return from");
-                return;
-            }
-
-            if (PlayerResourceManager.Instance != null && _totalGoldEarned > 0)
-            {
-                PlayerResourceManager.Instance.AddGold(_totalGoldEarned);
-            }
-
-            Debug.Log($"[ExpeditionManager] Returning to town with {_totalGoldEarned} gold");
-
+            var expedition = _currentExpedition;
             _isExpeditionActive = false;
             _currentExpedition = null;
+
+            OnExpeditionEnd?.Invoke(expedition, reason, totalGold);
+
+            GameManager.Instance?.GoToTown();
         }
 
         public StageData GetCurrentStage()

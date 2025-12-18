@@ -45,5 +45,10 @@ namespace Data
 
         private float GetLevelMultiplier(int level)
             => 1f + (level - 1) * 0.1f;
+
+        public int GetCombatPower(int level = 1)
+        {
+            return (int)(GetHealth(level) + GetAttackDamage(level) * 5);
+        }
     }
 }

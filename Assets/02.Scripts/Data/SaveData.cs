@@ -9,6 +9,7 @@ namespace Data
         public int Gold;
         public List<MercenarySaveData> Mercenaries = new List<MercenarySaveData>();
         public string[] PartyIds = new string[4];
+        public List<ExpeditionProgress> ExpeditionProgressList = new List<ExpeditionProgress>();
     }
 
     [Serializable]

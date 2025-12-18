@@ -10,7 +10,7 @@ namespace UI
         [SerializeField] private GameObject _townPanel;
         [SerializeField] private GameObject _guildPanel;
         [SerializeField] private GameObject _tavernPanel;
-        [SerializeField] private GameObject _dungeonSelectPanel;
+        [SerializeField] private GameObject _expeditionSelectPanel;
 
         private GameObject _currentPanel;
 
@@ -44,9 +44,9 @@ namespace UI
             SwitchPanel(_tavernPanel);
         }
 
-        public void ShowDungeonSelect()
+        public void ShowExpeditionSelect()
         {
-            SwitchPanel(_dungeonSelectPanel);
+            SwitchPanel(_expeditionSelectPanel);
         }
 
         private void SwitchPanel(GameObject panel)
@@ -54,8 +54,8 @@ namespace UI
             if (_townPanel != null) _townPanel.SetActive(panel == _townPanel);
             if (_guildPanel != null) _guildPanel.SetActive(panel == _guildPanel);
             if (_tavernPanel != null) _tavernPanel.SetActive(panel == _tavernPanel);
-            if (_dungeonSelectPanel != null) _dungeonSelectPanel.SetActive(panel == _dungeonSelectPanel);
-            
+            if (_expeditionSelectPanel != null) _expeditionSelectPanel.SetActive(panel == _expeditionSelectPanel);
+
             _currentPanel = panel;
         }
 

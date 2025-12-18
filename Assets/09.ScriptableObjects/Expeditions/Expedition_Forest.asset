@@ -20,11 +20,6 @@ MonoBehaviour:
   RecommendedPower: 280
   Battles:
   - {fileID: 11400000, guid: 9e00d303329aa4620ab47d4b8cdc5a71, type: 2}
-  - {fileID: 11400000, guid: ed2052e69703c49aba09e8123c0df4d2, type: 2}
-  - {fileID: 11400000, guid: b46fc7797895041aa9fe18672e19b12f, type: 2}
-  - {fileID: 11400000, guid: d9d5479ae49f04269baf823a53fb40fb, type: 2}
-  - {fileID: 11400000, guid: 2f2a6f56bcc6f432ca7ef4c6d15a32bc, type: 2}
-  - {fileID: 11400000, guid: 2f2a6f56bcc6f432ca7ef4c6d15a32bc, type: 2}
   CompletionBonus: 120
   FirstClearBonus: 200
-  UnlockRequirement: {fileID: 11400000, guid: 02fa57fc705764fc0b74c62d8017ae9f, type: 2}
+  UnlockRequirement: {fileID: 0}

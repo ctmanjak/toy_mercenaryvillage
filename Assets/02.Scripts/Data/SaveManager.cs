@@ -44,6 +44,11 @@ namespace Data
                 PartyManager.Instance.ApplyLoadedParty(data?.PartyIds);
             }
 
+            if (ExpeditionProgressManager.Instance != null)
+            {
+                ExpeditionProgressManager.Instance.LoadFromSaveData(data?.ExpeditionProgressList);
+            }
+
             Debug.Log("[SaveManager] 게임 로드 완료");
         }
 
@@ -60,6 +65,11 @@ namespace Data
             if (PartyManager.Instance != null)
             {
                 data.PartyIds = PartyManager.Instance.GetPartyIdsForSave();
+            }
+
+            if (ExpeditionProgressManager.Instance != null)
+            {
+                data.ExpeditionProgressList = ExpeditionProgressManager.Instance.GetAllProgress();
             }
 
             SaveToFile(data);

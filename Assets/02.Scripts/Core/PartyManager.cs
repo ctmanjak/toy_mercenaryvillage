@@ -209,5 +209,18 @@ namespace Core
         }
 
         public int PartySize => PARTY_SIZE;
+
+        public int GetTotalCombatPower()
+        {
+            int totalPower = 0;
+            foreach (var merc in _partySlots)
+            {
+                if (merc?.UnitData != null)
+                {
+                    totalPower += merc.UnitData.GetCombatPower(merc.Level);
+                }
+            }
+            return totalPower;
+        }
     }
 }

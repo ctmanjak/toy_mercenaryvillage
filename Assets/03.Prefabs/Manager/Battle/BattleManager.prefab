@@ -46,8 +46,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Battle.BattleManager
   _spawnManager: {fileID: 0}
   _resultUI: {fileID: 0}
-  _testParty:
-  - {fileID: 11400000, guid: e0e63173dc9d54ec880861b25af5c078, type: 2}
-  - {fileID: 11400000, guid: e0e63173dc9d54ec880861b25af5c078, type: 2}
-  - {fileID: 11400000, guid: e0e63173dc9d54ec880861b25af5c078, type: 2}
-  _testPartyLevel: 1

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 901881748589088791}
   - component: {fileID: 1893213674524828421}
   m_Layer: 5
-  m_Name: DungeonButton
+  m_Name: ExpeditionButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa4d4795d6adc4c699f50b4fa4a935d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UI.TownUI
-  _dungeonButton: {fileID: 1893213674524828421}
+  _expeditionButton: {fileID: 1893213674524828421}
   _guildButton: {fileID: 1959945429297877488}
   _tavernButton: {fileID: 1227839674611158360}
   _comingSoonPopup: {fileID: 3222800858218977821}
@@ -834,7 +834,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB358\uC804"
+  m_text: "\uC6D0\uC815"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 06a16608dbc6b4487a967a724d84ed63, type: 2}
   m_sharedMaterial: {fileID: 9119907907537136759, guid: 06a16608dbc6b4487a967a724d84ed63, type: 2}

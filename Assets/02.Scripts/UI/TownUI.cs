@@ -7,7 +7,7 @@ namespace UI
     public class TownUI : MonoBehaviour
     {
         [Header("Building Buttons")]
-        [SerializeField] private Button _dungeonButton;
+        [SerializeField] private Button _expeditionButton;
         [SerializeField] private Button _guildButton;
         [SerializeField] private Button _tavernButton;
 
@@ -18,9 +18,9 @@ namespace UI
 
         private void Start()
         {
-            if (_dungeonButton != null)
+            if (_expeditionButton != null)
             {
-                _dungeonButton.onClick.AddListener(OnDungeonButtonClicked);
+                _expeditionButton.onClick.AddListener(OnExpeditionButtonClicked);
             }
 
             if (_guildButton != null)
@@ -43,9 +43,9 @@ namespace UI
 
         private void OnDestroy()
         {
-            if (_dungeonButton != null)
+            if (_expeditionButton != null)
             {
-                _dungeonButton.onClick.RemoveListener(OnDungeonButtonClicked);
+                _expeditionButton.onClick.RemoveListener(OnExpeditionButtonClicked);
             }
 
             if (_guildButton != null)
@@ -64,9 +64,9 @@ namespace UI
             }
         }
 
-        private void OnDungeonButtonClicked()
+        private void OnExpeditionButtonClicked()
         {
-            TownUIManager.Instance?.ShowDungeonSelect();
+            TownUIManager.Instance?.ShowExpeditionSelect();
         }
 
         private void OnGuildButtonClicked()
