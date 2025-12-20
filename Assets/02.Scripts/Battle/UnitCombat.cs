@@ -7,16 +7,25 @@ namespace Battle
     {
         private BattleUnit _unit;
         private float _attackTimer;
+        private bool _isAttacking;
+        private BattleUnit _attackTarget;
 
         private void Awake()
         {
             _unit = GetComponent<BattleUnit>();
         }
 
+        private void Start()
+        {
+            _unit.UnitAnimator.OnAttackHit += HandleAttackHit;
+        }
+
         public void UpdateCombat(BattleUnit target)
         {
             if (target == null || target.IsDead) return;
             if (_unit.IsDead) return;
+
+            if (_isAttacking) return;
 
             if (!CanAttack(target))
             {
@@ -52,7 +61,20 @@ namespace Battle
 
         private void PerformAttack(BattleUnit target)
         {
-            target.TakeDamage(_unit.AttackDamage);
+            _isAttacking = true;
+            _attackTarget = target;
+            _unit.UnitAnimator.PlayAttack();
+        }
+
+        private void HandleAttackHit()
+        {
+            if (_attackTarget != null && _attackTarget.IsAlive)
+            {
+                _attackTarget.TakeDamage(_unit.AttackDamage);
+            }
+
+            _isAttacking = false;
+            _attackTarget = null;
         }
 
         public void ResetAttackTimer()

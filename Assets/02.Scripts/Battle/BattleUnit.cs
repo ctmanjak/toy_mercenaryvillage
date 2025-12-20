@@ -10,6 +10,7 @@ namespace Battle
     
     [RequireComponent(typeof(UnitMovement))]
     [RequireComponent(typeof(UnitCombat))]
+    [RequireComponent(typeof(UnitAnimator))]
     public class BattleUnit : MonoBehaviour
     {
         [Header("Status")]
@@ -25,6 +26,7 @@ namespace Battle
 
         private UnitMovement _movement;
         private UnitCombat _combat;
+        private UnitAnimator _unitAnimator;
         private UnitHealthBar _healthBar;
 
         #region Properties
@@ -49,7 +51,12 @@ namespace Battle
         {
             _movement = GetComponent<UnitMovement>();
             _combat = GetComponent<UnitCombat>();
+            _unitAnimator = GetComponent<UnitAnimator>();
+
+            _unitAnimator.OnDeathComplete += HandleDeathComplete;
         }
+
+        public UnitAnimator UnitAnimator => _unitAnimator;
 
         public void Initialize(UnitStats stats, Team team)
         {
@@ -81,6 +88,9 @@ namespace Battle
 
             _health -= damage;
             _healthBar?.UpdateHealthBar();
+            _unitAnimator.PlayHitFlash();
+
+            DamagePopupSpawner.Instance?.Show(transform.position, (int)damage, _team == Team.Ally);
 
             if (_health <= 0f)
             {
@@ -92,7 +102,14 @@ namespace Battle
         public void SetState(UnitState newState)
         {
             if (IsDead && newState != UnitState.Dead) return;
+
+            var prevState = _state;
             _state = newState;
+
+            if (prevState != newState)
+            {
+                _unitAnimator.SetMoving(newState == UnitState.Move);
+            }
         }
         
         public void SetTarget(BattleUnit target)
@@ -130,9 +147,13 @@ namespace Battle
             _currentTarget = null;
 
             _healthBar?.Hide();
+            _unitAnimator.StopHitFlash();
+            _unitAnimator.PlayDeath();
+        }
 
+        private void HandleDeathComplete()
+        {
             OnDeath?.Invoke(this);
-
             gameObject.SetActive(false);
         }
         
