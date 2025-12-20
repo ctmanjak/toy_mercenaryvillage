@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Core;
 using Data;
 using UnityEngine;
 
@@ -20,42 +19,12 @@ namespace UI
 
         private void Start()
         {
-            // SubscribeToEvents();
             Refresh();
         }
-    
+
         private void OnDestroy()
         {
-            // UnsubscribeFromEvents();
             ClearSlots();
-        }
-    
-        private void SubscribeToEvents()
-        {
-            if (PlayerResourceManager.Instance != null)
-            {
-                PlayerResourceManager.Instance.OnMercenaryAdded += HandleMercenaryAdded;
-                PlayerResourceManager.Instance.OnMercenaryRemoved += HandleMercenaryRemoved;
-            }
-        
-            if (PartyManager.Instance != null)
-            {
-                PartyManager.Instance.OnPartyChanged += HandlePartyChanged;
-            }
-        }
-    
-        private void UnsubscribeFromEvents()
-        {
-            if (PlayerResourceManager.Instance != null)
-            {
-                PlayerResourceManager.Instance.OnMercenaryAdded -= HandleMercenaryAdded;
-                PlayerResourceManager.Instance.OnMercenaryRemoved -= HandleMercenaryRemoved;
-            }
-        
-            if (PartyManager.Instance != null)
-            {
-                PartyManager.Instance.OnPartyChanged -= HandlePartyChanged;
-            }
         }
     
         public void Refresh()
@@ -126,34 +95,6 @@ namespace UI
             if (slot != null)
             {
                 SelectSlot(slot);
-            }
-        }
-    
-        private void HandleMercenaryAdded(MercenaryData mercenary)
-        {
-            CreateSlot(mercenary);
-        }
-    
-        private void HandleMercenaryRemoved(MercenaryData mercenary)
-        {
-            var slot = _slots.Find(s => s.Mercenary == mercenary);
-            if (slot != null)
-            {
-                if (_selectedSlot == slot)
-                {
-                    _selectedSlot = null;
-                }
-                slot.OnSlotClicked -= HandleSlotClicked;
-                _slots.Remove(slot);
-                Destroy(slot.gameObject);
-            }
-        }
-    
-        private void HandlePartyChanged()
-        {
-            foreach (var slot in _slots)
-            {
-                slot.UpdatePartyBadge();
             }
         }
     }

@@ -6,9 +6,6 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    /// <summary>
-    /// 개별 파티 슬롯 UI 컴포넌트
-    /// </summary>
     public class PartySlotUI : MonoBehaviour
     {
         [Header("UI References")]
@@ -48,36 +45,24 @@ namespace UI
                 _button.onClick.RemoveListener(HandleClick);
             }
         }
-
-        /// <summary>
-        /// 슬롯 인덱스 설정
-        /// </summary>
+        
         public void SetSlotIndex(int index)
         {
             _slotIndex = index;
         }
-
-        /// <summary>
-        /// 슬롯에 용병 설정
-        /// </summary>
+        
         public void SetMercenary(MercenaryData mercenary)
         {
             _mercenary = mercenary;
             UpdateDisplay();
         }
-
-        /// <summary>
-        /// 슬롯 비우기
-        /// </summary>
+        
         public void Clear()
         {
             _mercenary = null;
             UpdateDisplay();
         }
-
-        /// <summary>
-        /// 하이라이트 설정
-        /// </summary>
+        
         public void SetHighlight(bool highlighted)
         {
             if (_background != null)

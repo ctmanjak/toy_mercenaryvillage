@@ -22,8 +22,6 @@ namespace Data
         private List<MercenaryData> _mercenaries = new List<MercenaryData>();
 
         public event Action<int> OnGoldChanged;
-        public event Action<MercenaryData> OnMercenaryAdded;
-        public event Action<MercenaryData> OnMercenaryRemoved;
 
         private void Awake()
         {
@@ -102,7 +100,6 @@ namespace Data
             if (_mercenaries.Any(m => m.Id == merc.Id)) return;
 
             _mercenaries.Add(merc);
-            OnMercenaryAdded?.Invoke(merc);
             SaveManager.Instance?.SaveGame();
         }
 
@@ -114,7 +111,6 @@ namespace Data
             if (existing != null)
             {
                 _mercenaries.Remove(existing);
-                OnMercenaryRemoved?.Invoke(existing);
                 SaveManager.Instance?.SaveGame();
             }
         }

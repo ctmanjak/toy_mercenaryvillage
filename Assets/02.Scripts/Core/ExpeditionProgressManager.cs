@@ -128,7 +128,6 @@ namespace Core
 
             Debug.Log($"[ExpeditionProgressManager] First clear bonus claimed: {bonus}G");
 
-            // 첫 완료 보너스 수령 상태 저장
             SaveManager.Instance?.SaveGame();
 
             return true;
