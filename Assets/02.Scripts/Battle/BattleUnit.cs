@@ -76,6 +76,7 @@ namespace Battle
             _state = UnitState.Idle;
             _currentTarget = null;
 
+            _unitAnimator.ResetFade();
             _healthBar?.Initialize(this);
         }
 
@@ -164,8 +165,11 @@ namespace Battle
 
         private void HandleDeathComplete()
         {
-            OnDeath?.Invoke(this);
-            gameObject.SetActive(false);
+            _unitAnimator.PlayDeathFade(() =>
+            {
+                OnDeath?.Invoke(this);
+                gameObject.SetActive(false);
+            });
         }
         
         public void UpdateTarget()

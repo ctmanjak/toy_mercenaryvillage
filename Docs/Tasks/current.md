@@ -1,31 +1,84 @@
 ## 목표
 
-스켈레톤 4종을 활용해 스테이지별 적 조합을 설계하고, 난이도 곡선을 테스트/조정한다.
+전투 시 간단한 시각적 피드백을 추가한다.
+
+---
 
 ## 산출물
 
-- StageData 5개 (초원 1-1 ~ 1-5) 적 구성 설정
-- 난이도 테스트 결과 문서
+- 사망 페이드 이펙트 (All In 1 Sprite Shader 활용)
 
-## 스테이지별 적 조합
+---
 
-| 스테이지 | 적 구성 | 의도 |
-| --- | --- | --- |
-| 1-1 | 전사 ×2 | 튜토리얼, 기본 전투 학습 |
-| 1-2 | 전사 ×2, 궁수 ×1 | 원거리 적 첫 등장 |
-| 1-3 | 전사 ×1, 궁수 ×2, 방패병 ×1 | 탱커 첫 등장 |
-| 1-4 | 전사 ×2, 궁수 ×1, 메이지 ×1 | 메이지 첫 등장, 고딜 위협 |
-| 1-5 | 방패병 ×1, 전사 ×1, 궁수 ×1, 메이지 ×1 | 풀 구성, 챕터 마무리 |
+## 구현 내용
 
-## 목표 난이도
+### 공격 이펙트
 
-- 1-1~1-2: 초기 파티(2인, Lv.1)로 클리어 가능
-- 1-3: 3인 파티 권장
-- 1-4~1-5: 4인 파티 + 레벨업 권장
+- 근접 공격: 스킵 (애니메이션만 사용)
+- 원거리 공격: 기존 ProjectileManager 투사체 시스템 활용
+
+### 사망 이펙트
+
+- All In 1 Sprite Shader의 `_FadeAmount` 프로퍼티 활용
+- Death 애니메이션 완료 후 페이드아웃 시작
+- 지속 시간: 1.0초 (Inspector에서 조정 가능)
+
+---
+
+## 구현 상세
+
+### UnitAnimator.cs
+
+```csharp
+// Death Fade 관련 필드
+private static readonly int _fadeAmount = Shader.PropertyToID("_FadeAmount");
+[SerializeField] private float _deathFadeDuration = 1.0f;
+
+// 페이드아웃 실행
+public void PlayDeathFade(Action onComplete)
+{
+    StartCoroutine(DeathFadeCoroutine(onComplete));
+}
+
+private IEnumerator DeathFadeCoroutine(Action onComplete)
+{
+    float elapsed = 0f;
+    while (elapsed < _deathFadeDuration)
+    {
+        elapsed += Time.deltaTime;
+        SetFadeAmount(elapsed / _deathFadeDuration);
+        yield return null;
+    }
+    onComplete?.Invoke();
+}
+```
+
+### BattleUnit.cs
+
+```csharp
+// 애니메이션 완료 후 페이드아웃 시작
+private void HandleDeathComplete()
+{
+    _unitAnimator.PlayDeathFade(() =>
+    {
+        OnDeath?.Invoke(this);
+        gameObject.SetActive(false);
+    });
+}
+
+// 유닛 재사용 시 페이드 초기화
+public void Initialize(UnitStats stats, Team team)
+{
+    // ...
+    _unitAnimator.ResetFade();
+}
+```
+
+---
 
 ## 수락 기준
 
-- StageData 5개에 적 구성 설정 완료
-- 초기 파티로 1-1, 1-2 클리어 테스트
-- 4인 Lv.2 파티로 1-5 클리어 테스트
-- 필요 시 적 수/구성 조정
+- [x]  원거리 공격 시 투사체 이펙트 재생
+- [x]  사망 시 페이드아웃
+- [x]  유닛 재사용 시 페이드 초기화
+- [x]  이펙트가 전투 성능에 영향 없음

@@ -15,13 +15,20 @@ namespace Battle
         private MaterialPropertyBlock _propertyBlock;
         private Coroutine _flashCoroutine;
         
-        private static readonly int _isMoving = Animator.StringToHash("1_Move");
+        private static readonly int _moveTrigger = Animator.StringToHash("1_Move");
         private static readonly int _attackTrigger = Animator.StringToHash("2_Attack");
         private static readonly int _attackBowTrigger = Animator.StringToHash("Attack_Bow");
         private static readonly int _attackStaffTrigger = Animator.StringToHash("Attack_Staff");
         private static readonly int _deathTrigger = Animator.StringToHash("4_Death");
+        private static readonly int _isDeath = Animator.StringToHash("isDeath");
         
         private static readonly int _hitEffectBlend = Shader.PropertyToID("_HitEffectBlend");
+        private static readonly int _fadeAmount = Shader.PropertyToID("_FadeAmount");
+
+        [Header("Death Fade")]
+        [SerializeField] private float _deathFadeDuration = 1.0f;
+
+        private Coroutine _deathFadeCoroutine;
 
         public event Action OnAttackHit;
 
@@ -45,13 +52,13 @@ namespace Battle
             }
             relay.Initialize(this);
             
-            _spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
+            _spriteRenderers = GetComponentsInChildren<SpriteRenderer>(true);
             _propertyBlock = new MaterialPropertyBlock();
         }
 
         public void SetMoving(bool isMoving)
         {
-            _animator.SetBool(_isMoving, isMoving);
+            _animator.SetBool(_moveTrigger, isMoving);
         }
 
         public void PlayAttack(AttackType attackType = AttackType.Melee)
@@ -73,6 +80,7 @@ namespace Battle
         public void PlayDeath()
         {
             _animator.SetTrigger(_deathTrigger);
+            _animator.SetBool(_isDeath, true);
         }
         
         public void AnimEvent_AttackHit()
@@ -124,6 +132,53 @@ namespace Battle
                 _propertyBlock.SetFloat(_hitEffectBlend, value);
                 sr.SetPropertyBlock(_propertyBlock);
             }
+        }
+
+        #endregion
+
+        #region Death Fade
+
+        public void PlayDeathFade(Action onComplete)
+        {
+            if (_deathFadeCoroutine != null)
+            {
+                StopCoroutine(_deathFadeCoroutine);
+            }
+            _deathFadeCoroutine = StartCoroutine(DeathFadeCoroutine(onComplete));
+        }
+
+        private IEnumerator DeathFadeCoroutine(Action onComplete)
+        {
+            float elapsed = 0f;
+
+            while (elapsed < _deathFadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / _deathFadeDuration;
+                SetFadeAmount(t);
+                yield return null;
+            }
+
+            SetFadeAmount(1f);
+            _deathFadeCoroutine = null;
+            onComplete?.Invoke();
+        }
+
+        private void SetFadeAmount(float value)
+        {
+            foreach (var sr in _spriteRenderers)
+            {
+                if (sr == null) continue;
+
+                sr.GetPropertyBlock(_propertyBlock);
+                _propertyBlock.SetFloat(_fadeAmount, value);
+                sr.SetPropertyBlock(_propertyBlock);
+            }
+        }
+
+        public void ResetFade()
+        {
+            SetFadeAmount(0f);
         }
 
         #endregion
