@@ -47,7 +47,7 @@ MonoBehaviour:
   _unitTemplates:
   - {fileID: 11400000, guid: adf7e7c8c4e6443b5881abe53f07c256, type: 2}
   - {fileID: 11400000, guid: 0374724413d75470aba00ea056b733b7, type: 2}
-  - {fileID: 11400000, guid: a3403a686603f46cd8f4774811351076, type: 2}
+  - {fileID: 11400000, guid: 2ef5617dc1d8d46b899ba6e5b89c8d2b, type: 2}
   _tankHireCost: 100
   _damageHireCost: 80
   _supportHireCost: 80

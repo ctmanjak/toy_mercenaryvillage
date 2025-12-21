@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Data.UnitDatabase
   _units:
   - {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
-  - {fileID: 11400000, guid: e0e63173dc9d54ec880861b25af5c078, type: 2}
   - {fileID: 11400000, guid: 0374724413d75470aba00ea056b733b7, type: 2}
-  - {fileID: 11400000, guid: a3403a686603f46cd8f4774811351076, type: 2}
+  - {fileID: 11400000, guid: 2ef5617dc1d8d46b899ba6e5b89c8d2b, type: 2}
   - {fileID: 11400000, guid: adf7e7c8c4e6443b5881abe53f07c256, type: 2}
+  - {fileID: 11400000, guid: 87fe7f985be3644d7be841ad009fcec1, type: 2}

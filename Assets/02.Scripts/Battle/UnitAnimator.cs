@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Data;
 using UnityEngine;
 
 namespace Battle
@@ -16,6 +17,8 @@ namespace Battle
         
         private static readonly int _isMoving = Animator.StringToHash("1_Move");
         private static readonly int _attackTrigger = Animator.StringToHash("2_Attack");
+        private static readonly int _attackBowTrigger = Animator.StringToHash("Attack_Bow");
+        private static readonly int _attackStaffTrigger = Animator.StringToHash("Attack_Staff");
         private static readonly int _deathTrigger = Animator.StringToHash("4_Death");
         
         private static readonly int _hitEffectBlend = Shader.PropertyToID("_HitEffectBlend");
@@ -51,9 +54,20 @@ namespace Battle
             _animator.SetBool(_isMoving, isMoving);
         }
 
-        public void PlayAttack()
+        public void PlayAttack(AttackType attackType = AttackType.Melee)
         {
-            _animator.SetTrigger(_attackTrigger);
+            switch (attackType)
+            {
+                case AttackType.Melee:
+                    _animator.SetTrigger(_attackTrigger);
+                    break;
+                case AttackType.Bow:
+                    _animator.SetTrigger(_attackBowTrigger);
+                    break;
+                case AttackType.Staff:
+                    _animator.SetTrigger(_attackStaffTrigger);
+                    break;
+            }
         }
 
         public void PlayDeath()

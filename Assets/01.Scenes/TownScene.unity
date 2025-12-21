@@ -216,6 +216,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: TavernManager
       objectReference: {fileID: 0}
+    - target: {fileID: 8231515346121839282, guid: 924d47721cbd14cc8a5dccfa41d96476, type: 3}
+      propertyPath: _unitTemplates.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8231515346121839282, guid: 924d47721cbd14cc8a5dccfa41d96476, type: 3}
+      propertyPath: '_unitTemplates.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 87fe7f985be3644d7be841ad009fcec1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

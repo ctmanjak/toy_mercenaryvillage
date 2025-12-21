@@ -4,6 +4,7 @@ using UnityEngine;
 namespace Data
 {
     public enum UnitRole { Tank, Damage, Support }
+    public enum AttackType { Melee, Bow, Staff }
 
     [CreateAssetMenu(fileName = "Unit_", menuName = "Game/Unit Data")]
     public class UnitData : ScriptableObject
@@ -17,6 +18,9 @@ namespace Data
 
         [Tooltip("직업")]
         public UnitRole Role;
+
+        [Tooltip("공격 타입")]
+        public AttackType AttackType;
 
         [Tooltip("유닛 프리팹")]
         public BattleUnit Prefab;
@@ -36,6 +40,10 @@ namespace Data
 
         [Tooltip("기본 사거리")]
         public float BaseAttackRange = 1.5f;
+
+        [Header("Projectile")]
+        [Tooltip("투사체 데이터 (null이면 근거리 공격)")]
+        public ProjectileData ProjectileData;
 
         public float GetHealth(int level)
             => BaseHealth * GetLevelMultiplier(level);

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57d38f782bd484819bc53d6e02ad87e0, type: 3}
+  m_Name: Stage_2-1
+  m_EditorClassIdentifier: Assembly-CSharp::Data.StageData
+  StageId: 2-1
+  StageName: "\uC232 \uC785\uAD6C"
+  Enemies:
+  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+    Level: 1
+    SpawnIndex: 0
+  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+    Level: 1
+    SpawnIndex: 1
+  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+    Level: 1
+    SpawnIndex: 2
+  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+    Level: 1
+    SpawnIndex: 3
+  RecommendedPower: 220
+  GoldReward: 130

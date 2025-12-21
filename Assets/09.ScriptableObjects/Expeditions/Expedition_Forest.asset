@@ -19,7 +19,7 @@ MonoBehaviour:
   Icon: {fileID: 0}
   RecommendedPower: 280
   Battles:
-  - {fileID: 11400000, guid: 9e00d303329aa4620ab47d4b8cdc5a71, type: 2}
+  - {fileID: 11400000, guid: 2a0b553b2d47f49b6b6be673620988ec, type: 2}
   CompletionBonus: 120
   FirstClearBonus: 200
   UnlockRequirement: {fileID: 0}

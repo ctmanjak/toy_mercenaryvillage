@@ -63,14 +63,26 @@ namespace Battle
         {
             _isAttacking = true;
             _attackTarget = target;
-            _unit.UnitAnimator.PlayAttack();
+            _unit.UnitAnimator.PlayAttack(_unit.AttackType);
         }
 
         private void HandleAttackHit()
         {
             if (_attackTarget != null && _attackTarget.IsAlive)
             {
-                _attackTarget.TakeDamage(_unit.AttackDamage);
+                if (_unit.IsRanged)
+                {
+                    ProjectileManager.Instance.FireProjectile(
+                        _unit.FirePosition,
+                        _attackTarget,
+                        _unit.ProjectileData,
+                        _unit.AttackDamage
+                    );
+                }
+                else
+                {
+                    _attackTarget.TakeDamage(_unit.AttackDamage);
+                }
             }
 
             _isAttacking = false;

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6025177c6e9274c0abd10a5188073826, type: 3}
+  m_Name: Projectile_Arrow
+  m_EditorClassIdentifier: Assembly-CSharp::Data.ProjectileData
+  MovementType: 1
+  Speed: 8
+  ArcHeight: 4
+  RotateToDirection: 1
+  Prefab: {fileID: 4290393574566571420, guid: 1ef4ee405ed484f1a98a8eaa32217e72, type: 3}
+  ImpactEffect: {fileID: 0}

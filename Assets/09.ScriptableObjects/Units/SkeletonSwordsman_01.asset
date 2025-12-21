@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf44ee1d64a0a4dcf965dd6077d49088, type: 3}
   m_Name: SkeletonSwordsman_01
   m_EditorClassIdentifier: Assembly-CSharp::Data.UnitData
-  UnitId: 10001
+  UnitId: skeleton_swordsman_01
   UnitName: SkeletonSwordsman
   Role: 1
   Prefab: {fileID: 1811917990876866780, guid: 5fbe5dba19d3e44ecbfed8693b87eb60, type: 3}
@@ -21,3 +21,4 @@ MonoBehaviour:
   BaseAttackSpeed: 1
   BaseMoveSpeed: 3
   BaseAttackRange: 1.5
+  ProjectileData: {fileID: 0}

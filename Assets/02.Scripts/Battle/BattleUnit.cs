@@ -23,6 +23,10 @@ namespace Battle
 
         [Header("Combat")]
         [SerializeField] private BattleUnit _currentTarget;
+        [SerializeField] private ProjectileData _projectileData;
+        [SerializeField] private AttackType _attackType;
+        [SerializeField] private Transform _firePoint;
+        [SerializeField] private Transform _hitPoint;
 
         private UnitMovement _movement;
         private UnitCombat _combat;
@@ -40,6 +44,11 @@ namespace Battle
         public float MoveSpeed => _stats.MoveSpeed;
         public float AttackRange => _stats.AttackRange;
         public BattleUnit CurrentTarget => _currentTarget;
+        public ProjectileData ProjectileData => _projectileData;
+        public AttackType AttackType => _attackType;
+        public bool IsRanged => _projectileData != null;
+        public Vector3 FirePosition => _firePoint != null ? _firePoint.position : transform.position;
+        public Vector3 HitPosition => _hitPoint != null ? _hitPoint.position : transform.position;
         public bool IsDead => _state == UnitState.Dead;
         public bool IsAlive => !IsDead;
         public float HealthRatio => _stats.MaxHealth > 0 ? _health / _stats.MaxHealth : 0f;
@@ -79,6 +88,8 @@ namespace Battle
         public void Initialize(UnitData data, int level, Team team)
         {
             var stats = UnitStats.FromUnitData(data, level);
+            _projectileData = data.ProjectileData;
+            _attackType = data.AttackType;
             Initialize(stats, team);
         }
         
