@@ -18,13 +18,13 @@ MonoBehaviour:
   - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
     Level: 1
     SpawnIndex: 0
-  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+  - UnitData: {fileID: 11400000, guid: 47da33badf579428d9e35742020855b3, type: 2}
     Level: 1
     SpawnIndex: 1
-  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+  - UnitData: {fileID: 11400000, guid: 98a65fd0730c24f268a8cb03f711e351, type: 2}
     Level: 1
     SpawnIndex: 2
-  - UnitData: {fileID: 11400000, guid: 1f8104d5d281d4355b79b035c6ad9133, type: 2}
+  - UnitData: {fileID: 11400000, guid: 4f51de35c468244e2a223aabbcc37ff0, type: 2}
     Level: 1
     SpawnIndex: 3
   RecommendedPower: 220

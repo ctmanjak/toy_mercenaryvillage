@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf44ee1d64a0a4dcf965dd6077d49088, type: 3}
-  m_Name: Tanker_01
+  m_Name: SkeletonMage_01
   m_EditorClassIdentifier: Assembly-CSharp::Data.UnitData
-  UnitId: tanker_01
-  UnitName: "\uBC29\uD328\uBCD1"
-  Role: 0
-  AttackType: 0
-  Prefab: {fileID: 1253733043721006873, guid: e135d30fd3651426d95c93334bcf71e5, type: 3}
-  BaseHealth: 150
-  BaseAttackDamage: 10
+  UnitId: skeleton_mage_01
+  UnitName: "\uC2A4\uCF08\uB808\uD1A4 \uBA54\uC774\uC9C0"
+  Role: 1
+  AttackType: 2
+  Prefab: {fileID: 6120557730192208938, guid: 2fbeb1e80d50845389de051d937a8ace, type: 3}
+  BaseHealth: 35
+  BaseAttackDamage: 28
   BaseAttackSpeed: 0.8
   BaseMoveSpeed: 2.5
-  BaseAttackRange: 1.5
-  ProjectileData: {fileID: 0}
+  BaseAttackRange: 5
+  ProjectileData: {fileID: 11400000, guid: 09f5205a7d2fc441ab81ed716fcc47ab, type: 2}

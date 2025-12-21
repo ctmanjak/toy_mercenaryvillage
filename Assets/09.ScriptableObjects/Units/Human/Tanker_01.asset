@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf44ee1d64a0a4dcf965dd6077d49088, type: 3}
+  m_Name: Tanker_01
+  m_EditorClassIdentifier: Assembly-CSharp::Data.UnitData
+  UnitId: tanker_01
+  UnitName: "\uBC29\uD328\uBCD1"
+  Role: 0
+  AttackType: 0
+  Prefab: {fileID: 1253733043721006873, guid: e135d30fd3651426d95c93334bcf71e5, type: 3}
+  BaseHealth: 150
+  BaseAttackDamage: 10
+  BaseAttackSpeed: 0.8
+  BaseMoveSpeed: 2.5
+  BaseAttackRange: 1
+  ProjectileData: {fileID: 0}

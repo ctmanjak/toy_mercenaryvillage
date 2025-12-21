@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf44ee1d64a0a4dcf965dd6077d49088, type: 3}
-  m_Name: SkeletonSwordsman_01
+  m_Name: SkeletonArcher_01
   m_EditorClassIdentifier: Assembly-CSharp::Data.UnitData
-  UnitId: skeleton_swordsman_01
-  UnitName: SkeletonSwordsman
+  UnitId: skeleton_archer_01
+  UnitName: "\uC2A4\uCF08\uB808\uD1A4 \uAD81\uC218"
   Role: 1
-  Prefab: {fileID: 1811917990876866780, guid: 5fbe5dba19d3e44ecbfed8693b87eb60, type: 3}
-  BaseHealth: 100
-  BaseAttackDamage: 10
+  AttackType: 1
+  Prefab: {fileID: 8218301104171502767, guid: d7977bfe5f75f427a859f8c26da31689, type: 3}
+  BaseHealth: 50
+  BaseAttackDamage: 15
   BaseAttackSpeed: 1
   BaseMoveSpeed: 3
-  BaseAttackRange: 1.5
-  ProjectileData: {fileID: 0}
+  BaseAttackRange: 5
+  ProjectileData: {fileID: 11400000, guid: 490161fb960e045f086f8b71785313ee, type: 2}
