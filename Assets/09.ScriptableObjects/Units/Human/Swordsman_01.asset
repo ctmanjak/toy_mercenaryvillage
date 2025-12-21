@@ -15,6 +15,7 @@ MonoBehaviour:
   UnitId: swordsman_01
   UnitName: "\uAC80\uC0AC"
   Role: 1
+  AttackType: 0
   Prefab: {fileID: 8379906347518684461, guid: 960facf2bb8e3452b8a8a67d3ee3ef67, type: 3}
   BaseHealth: 80
   BaseAttackDamage: 25

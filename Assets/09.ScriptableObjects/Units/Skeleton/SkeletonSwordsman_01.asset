@@ -17,8 +17,8 @@ MonoBehaviour:
   Role: 1
   AttackType: 0
   Prefab: {fileID: 1811917990876866780, guid: 5fbe5dba19d3e44ecbfed8693b87eb60, type: 3}
-  BaseHealth: 80
-  BaseAttackDamage: 18
+  BaseHealth: 70
+  BaseAttackDamage: 10
   BaseAttackSpeed: 1
   BaseMoveSpeed: 3
   BaseAttackRange: 1.5

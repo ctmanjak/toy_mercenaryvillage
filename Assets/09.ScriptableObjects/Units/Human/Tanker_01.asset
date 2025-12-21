@@ -20,6 +20,6 @@ MonoBehaviour:
   BaseHealth: 150
   BaseAttackDamage: 10
   BaseAttackSpeed: 0.8
-  BaseMoveSpeed: 2.5
+  BaseMoveSpeed: 3
   BaseAttackRange: 1
   ProjectileData: {fileID: 0}
