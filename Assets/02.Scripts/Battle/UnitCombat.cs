@@ -65,6 +65,7 @@ namespace Battle
         {
             _isAttacking = true;
             _attackTarget = target;
+            _unit.FaceTarget(target);
             _unit.UnitAnimator.PlayAttack(_unit.AttackType);
         }
 

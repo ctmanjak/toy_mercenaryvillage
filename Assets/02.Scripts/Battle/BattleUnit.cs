@@ -89,6 +89,7 @@ namespace Battle
         public IReadOnlyList<SkillData> Skills => _skills;
         public IReadOnlyList<SkillInstance> SkillInstances => _skillInstances;
         public bool IsSkillActivating => _isSkillActivating;
+        public Transform SpriteRoot => _spriteRoot;
         #endregion
 
         public event Action<BattleUnit> OnDeath;
@@ -210,6 +211,24 @@ namespace Battle
             _currentTarget = target;
         }
 
+        public void FaceTarget(Vector3 targetPosition)
+        {
+            if (_spriteRoot == null) return;
+
+            float direction = targetPosition.x - transform.position.x;
+            if (Mathf.Abs(direction) < 0.01f) return;
+
+            Vector3 scale = _spriteRoot.localScale;
+            scale.x = direction > 0 ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
+            _spriteRoot.localScale = scale;
+        }
+
+        public void FaceTarget(BattleUnit target)
+        {
+            if (target == null) return;
+            FaceTarget(target.transform.position);
+        }
+
         public void UpdateAI()
         {
             if (IsDead) return;
@@ -296,6 +315,7 @@ namespace Battle
 
             Debug.Log($"[BattleUnit] {gameObject.name} activates {skillData.SkillName} on {effectTargets.Count} target(s)");
 
+            FaceTarget(primaryTarget);
             SkillEffectExecutor.Execute(this, primaryTarget, skillData, effectTargets);
 
             skillInstance.ResetCooldown();

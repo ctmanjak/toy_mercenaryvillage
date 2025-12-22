@@ -32,6 +32,7 @@ namespace Battle
             }
 
             _unit.SetState(UnitState.Move);
+            _unit.FaceTarget(target);
             Vector2 direction = ((Vector2)target.transform.position - (Vector2)_transform.position).normalized;
             _transform.position += (Vector3)(direction * _unit.MoveSpeed * Time.deltaTime);
         }
