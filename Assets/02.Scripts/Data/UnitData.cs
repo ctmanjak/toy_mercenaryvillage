@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Battle;
 using UnityEngine;
 
@@ -44,6 +45,10 @@ namespace Data
         [Header("Projectile")]
         [Tooltip("투사체 데이터 (null이면 근거리 공격)")]
         public ProjectileData ProjectileData;
+
+        [Header("Skills")]
+        [Tooltip("보유 스킬 목록 (MVP에서는 1개만 사용)")]
+        public List<SkillData> Skills = new List<SkillData>();
 
         public float GetHealth(int level)
             => BaseHealth * GetLevelMultiplier(level);

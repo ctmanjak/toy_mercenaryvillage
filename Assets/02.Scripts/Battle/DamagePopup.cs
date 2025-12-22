@@ -17,15 +17,26 @@ namespace Battle
         [Header("Colors")]
         [SerializeField] private Color _allyDamageColor = Color.red;
         [SerializeField] private Color _enemyDamageColor = Color.white;
+        [SerializeField] private Color _healColor = Color.green;
 
         private Vector3 _startPos;
         private Color[] _startColors;
 
         public void Setup(int damage, bool isAllyDamage)
         {
-            _damageText.color = isAllyDamage ? _allyDamageColor : _enemyDamageColor;
+            SetupInternal(damage.ToString(), isAllyDamage ? _allyDamageColor : _enemyDamageColor);
+        }
+
+        public void SetupHeal(int healAmount)
+        {
+            SetupInternal($"+{healAmount}", _healColor);
+        }
+
+        private void SetupInternal(string text, Color color)
+        {
+            _damageText.color = color;
             _startPos = transform.position;
-            
+
             if (_startColors == null || _startColors.Length != _texts.Length)
             {
                 _startColors = new Color[_texts.Length];
@@ -33,7 +44,7 @@ namespace Battle
 
             for (int i = 0; i < _texts.Length; i++)
             {
-                _texts[i].text = damage.ToString();
+                _texts[i].text = text;
                 _startColors[i] = _texts[i].color;
             }
 

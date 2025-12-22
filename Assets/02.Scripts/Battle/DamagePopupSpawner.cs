@@ -24,6 +24,13 @@ namespace Battle
             popup.Setup(damage, isAllyDamage);
         }
 
+        public void ShowHeal(Vector3 position, int healAmount)
+        {
+            var popup = PoolManager.Instance.Get(_prefab);
+            popup.transform.position = position + GetRandomOffset();
+            popup.SetupHeal(healAmount);
+        }
+
         private Vector3 GetRandomOffset()
         {
             return new Vector3(

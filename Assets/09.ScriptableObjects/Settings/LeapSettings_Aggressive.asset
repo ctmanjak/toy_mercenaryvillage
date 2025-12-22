@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab6183329b1e54dbcb1780cfb9bc1467, type: 3}
+  m_Name: LeapSettings_Aggressive
+  m_EditorClassIdentifier: Assembly-CSharp::Data.LeapSettings
+  AnticipationTime: 0.08
+  HangTimeRatio: 0.05
+  LandingTime: 0.1
+  BackDistance: 0.2
+  SquashScale: {x: 1.3, y: 0.6}
+  StretchScale: {x: 0.7, y: 1.4}
+  LandSquashScale: {x: 1.4, y: 0.5}

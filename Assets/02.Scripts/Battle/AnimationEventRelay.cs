@@ -15,7 +15,17 @@ namespace Battle
         {
             _unitAnimator?.AnimEvent_AttackHit();
         }
-        
+
+        public void AnimEvent_AttackEnd()
+        {
+            _unitAnimator?.AnimEvent_AttackEnd();
+        }
+
+        public void AnimEvent_SkillHit()
+        {
+            _unitAnimator?.AnimEvent_SkillHit();
+        }
+
         public void AnimEvent_DeathComplete()
         {
             _unitAnimator?.AnimEvent_DeathComplete();

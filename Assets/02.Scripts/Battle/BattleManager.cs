@@ -220,6 +220,11 @@ namespace Battle
             _phase = BattlePhase.Fighting;
             _battleResult = BattleResult.InProgress;
 
+            foreach (var unit in _allUnits)
+            {
+                unit.TriggerBattleStartSkills();
+            }
+
             Debug.Log($"[BattleManager] Battle started: {stage.StageName}");
         }
 

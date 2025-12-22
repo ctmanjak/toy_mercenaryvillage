@@ -23,3 +23,5 @@ MonoBehaviour:
   BaseMoveSpeed: 3.5
   BaseAttackRange: 1.5
   ProjectileData: {fileID: 0}
+  Skills:
+  - {fileID: 11400000, guid: c061e8491c6c542079292a9cfbf92620, type: 2}

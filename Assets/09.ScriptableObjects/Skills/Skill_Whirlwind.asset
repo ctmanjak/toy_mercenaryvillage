@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c276bff88047c4bbd85ffbe9d3b26901, type: 3}
+  m_Name: Skill_Whirlwind
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
+  SkillId: skill_whirlwind
+  SkillName: "\uD68C\uC624\uB9AC\uBCA0\uAE30"
+  Description: "\uC8FC\uBCC0 \uC801 \uC804\uCCB4\uC5D0\uAC8C \uB370\uBBF8\uC9C0\uB97C
+    \uC900\uB2E4."
+  Cooldown: 8
+  TriggerType: 0
+  TriggerValue: 0
+  EffectType: 1
+  HitCount: 2
+  TargetType: 2
+  Range: 3
+  EffectOrigin: 0
+  EffectRadius: 3
+  Icon: {fileID: 0}
+  EffectPrefab: {fileID: 0}
+  EffectDuration: 1
+  Parameters:
+  - Key: damage
+    Value: 20
+  CustomBehavior: {fileID: 11400000, guid: e396df0980bae41aaa978108c0d9d821, type: 2}

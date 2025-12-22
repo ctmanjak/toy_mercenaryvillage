@@ -1573,6 +1573,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1594313434803683920}
+  - {fileID: 2002431253853715709}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1644,6 +1645,10 @@ MonoBehaviour:
   _attackType: 0
   _firePoint: {fileID: 2744293720712369311}
   _hitPoint: {fileID: 6024846580061604548}
+  _shadow: {fileID: 2002431253853715709}
+  _spriteRoot: {fileID: 1594313434803683920}
+  _skills: []
+  _skillInstances: []
 --- !u!1 &3897179262474473887
 GameObject:
   m_ObjectHideFlags: 0
@@ -1836,13 +1841,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4357629232874043877}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.0265621, y: 1.0265621, z: 1.0265621}
+  m_LocalScale: {x: 1.0265622, y: 1.0265621, z: 1.0265622}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4981464200406737163}
-  m_Father: {fileID: 1594313434803683920}
+  m_Father: {fileID: 5006143028437850817}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4532143225431856281
 GameObject:
@@ -4372,7 +4377,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2089863045346886395}
-  - {fileID: 2002431253853715709}
   m_Father: {fileID: 5006143028437850817}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &147565686663990519

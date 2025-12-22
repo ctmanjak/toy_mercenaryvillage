@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c276bff88047c4bbd85ffbe9d3b26901, type: 3}
+  m_Name: Skill_Leap
+  m_EditorClassIdentifier: Assembly-CSharp::Data.SkillData
+  SkillId: skill_leap
+  SkillName: "\uB3C4\uC57D"
+  Description: "\uC804\uD22C \uC2DC\uC791 \uC2DC \uC801\uC5D0\uAC8C \uB3C4\uC57D\uD558\uC5EC
+    \uC811\uADFC\uD55C\uB2E4."
+  Cooldown: 0
+  TriggerType: 3
+  TriggerValue: 0
+  EffectType: 8
+  TargetType: 0
+  Range: 100
+  EffectOrigin: 0
+  EffectRadius: 0
+  Icon: {fileID: 0}
+  EffectPrefab: {fileID: 0}
+  EffectDuration: 0.5
+  Parameters:
+  - Key: duration
+    Value: 0.5
+  CustomBehavior: {fileID: 11400000, guid: 80801fe0e44e6449c90129e0e1e84b04, type: 2}

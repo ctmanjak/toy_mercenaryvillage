@@ -2800,13 +2800,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4445880630332310509}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.017768, y: 1.017768, z: 1.017768}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1182691567556951591}
-  m_Father: {fileID: 8006216823543678912}
+  m_Father: {fileID: 2083337337666280106}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4548650504718385951
 GameObject:
@@ -2996,6 +2996,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8006216823543678912}
+  - {fileID: 3757297724462435227}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3067,6 +3068,10 @@ MonoBehaviour:
   _attackType: 0
   _firePoint: {fileID: 6341862213458668425}
   _hitPoint: {fileID: 7642072191049278294}
+  _shadow: {fileID: 3757297724462435227}
+  _spriteRoot: {fileID: 8006216823543678912}
+  _skills: []
+  _skillInstances: []
 --- !u!1 &4913787432065836141
 GameObject:
   m_ObjectHideFlags: 0
@@ -3132,7 +3137,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1185936796473650916}
-  - {fileID: 3757297724462435227}
   m_Father: {fileID: 2083337337666280106}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &7323438508197910318

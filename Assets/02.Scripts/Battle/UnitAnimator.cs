@@ -21,7 +21,9 @@ namespace Battle
         private static readonly int _attackStaffTrigger = Animator.StringToHash("Attack_Staff");
         private static readonly int _deathTrigger = Animator.StringToHash("4_Death");
         private static readonly int _isDeath = Animator.StringToHash("isDeath");
-        
+        private static readonly int _isJumping = Animator.StringToHash("isJumping");
+        private static readonly int _whirlwindTrigger = Animator.StringToHash("Whirlwind");
+
         private static readonly int _hitEffectBlend = Shader.PropertyToID("_HitEffectBlend");
         private static readonly int _fadeAmount = Shader.PropertyToID("_FadeAmount");
 
@@ -31,6 +33,8 @@ namespace Battle
         private Coroutine _deathFadeCoroutine;
 
         public event Action OnAttackHit;
+        public event Action OnAttackEnd;
+        public event Action OnSkillHit;
 
         public event Action OnDeathComplete;
 
@@ -61,6 +65,22 @@ namespace Battle
             _animator.SetBool(_moveTrigger, isMoving);
         }
 
+        public void SetJumping(bool isJumping)
+        {
+            _animator.SetBool(_isJumping, isJumping);
+        }
+
+        public void PlayWhirlwind()
+        {
+            _animator.SetTrigger(_whirlwindTrigger);
+        }
+
+        public void PlaySkillAnimation(string triggerName)
+        {
+            if (string.IsNullOrEmpty(triggerName)) return;
+            _animator.SetTrigger(triggerName);
+        }
+
         public void PlayAttack(AttackType attackType = AttackType.Melee)
         {
             switch (attackType)
@@ -76,6 +96,42 @@ namespace Battle
                     break;
             }
         }
+        
+        private bool _waitingForAttackEnd;
+
+        public void PlayRepeatedAttack(AttackType attackType, int count, float speedMultiplier, Action onComplete)
+        {
+            StartCoroutine(RepeatedAttackCoroutine(attackType, count, speedMultiplier, onComplete));
+        }
+
+        private IEnumerator RepeatedAttackCoroutine(AttackType attackType, int count, float speedMultiplier, Action onComplete)
+        {
+            float originalSpeed = _animator.speed;
+            _animator.speed = speedMultiplier;
+
+            OnAttackEnd += HandleAttackEndForRepeated;
+
+            for (int i = 0; i < count; i++)
+            {
+                _waitingForAttackEnd = true;
+                PlayAttack(attackType);
+
+                while (_waitingForAttackEnd)
+                {
+                    yield return null;
+                }
+            }
+
+            OnAttackEnd -= HandleAttackEndForRepeated;
+
+            _animator.speed = originalSpeed;
+            onComplete?.Invoke();
+        }
+
+        private void HandleAttackEndForRepeated()
+        {
+            _waitingForAttackEnd = false;
+        }
 
         public void PlayDeath()
         {
@@ -87,7 +143,17 @@ namespace Battle
         {
             OnAttackHit?.Invoke();
         }
-        
+
+        public void AnimEvent_AttackEnd()
+        {
+            OnAttackEnd?.Invoke();
+        }
+
+        public void AnimEvent_SkillHit()
+        {
+            OnSkillHit?.Invoke();
+        }
+
         public void AnimEvent_DeathComplete()
         {
             OnDeathComplete?.Invoke();

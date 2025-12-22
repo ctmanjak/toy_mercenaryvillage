@@ -10,6 +10,8 @@ namespace Battle
         private bool _isAttacking;
         private BattleUnit _attackTarget;
 
+        public bool IsAttacking => _isAttacking;
+
         private void Awake()
         {
             _unit = GetComponent<BattleUnit>();
@@ -92,6 +94,12 @@ namespace Battle
         public void ResetAttackTimer()
         {
             _attackTimer = 0f;
+        }
+
+        public void CancelAttack()
+        {
+            _isAttacking = false;
+            _attackTarget = null;
         }
     }
 }
